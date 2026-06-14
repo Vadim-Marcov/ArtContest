@@ -1,3 +1,4 @@
+@model List<ArtContest.Models.Contest>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -24,60 +25,65 @@
             <h1 class="page-title">Конкурсы на проверку</h1>
             <div class="user-badge-inline">
                 <span class="user-role-tag">Модератор:</span>
-                <span class="user-login-label">mod_vadim</span>
+                <span class="user-login-label">@ViewBag.ModeratorLogin</span>
             </div>
         </header>
 
-        <section class="filters-container">
+        <form class="filters-container" method="get" action="/Moderator/Home">
             <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="Поиск конкурсов">
-                <span class="search-icon">
+                <input type="text" name="search" class="search-input" placeholder="Поиск конкурсов" value="@ViewBag.Search">
+                <button type="submit" class="search-icon-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                </span>
+                </button>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Категория</option>
-                    <option value="photo">Фотография</option>
-                    <option value="digital">Цифровой рисунок</option>
+                <select name="category" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var modCatSel = string.IsNullOrEmpty(ViewBag.SelectedCategory) ? "selected" : null;
+                    }
+                    <option value="" selected="@modCatSel">Категория</option>
+                    @foreach (var cat in ViewBag.Categories as List<ArtContest.Models.ContestCategory>)
+                    {
+                        var modCatItemSel = ViewBag.SelectedCategory == cat.Id.ToString() ? "selected" : null;
+                        <option value="@cat.Id" selected="@modCatItemSel">@cat.CategoryName</option>
+                    }
                 </select>
             </div>
-
-            <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Статус</option>
-                    <option value="active">Активные</option>
-                    <option value="pending">Ожидают</option>
-                </select>
-            </div>
-        </section>
+        </form>
 
         <section class="contests-grid">
-
-            <article class="contest-card">
-                <div class="contest-image-holder image-bg-blue"></div>
-                <div class="contest-card-content">
-                    <h2 class="contest-title">Осенняя палитра</h2>
-                    <p class="contest-info">Категория: Фотография</p>
-                    <p class="contest-counter-alert">Новых заявок: 12</p>
-                    <a href="/Moderator/ContestItems" class="btn-action">Смотреть заявки</a>
+            @if (Model.Any())
+            {
+                @foreach (var contest in Model)
+                {
+                    <article class="contest-card">
+                        @if (!string.IsNullOrEmpty(contest.ContestImage))
+                        {
+                            <div class="contest-image-holder" style="background-image:url('@Url.Content("~/images/" + contest.ContestImage)');background-size:cover;background-position:center;"></div>
+                        }
+                        else
+                        {
+                            <div class="contest-image-holder image-bg-blue"></div>
+                        }
+                        <div class="contest-card-content">
+                            <h2 class="contest-title">@contest.Title</h2>
+                            <p class="contest-info">Категория: @contest.Category?.CategoryName</p>
+                            <p class="contest-counter-alert">Новых заявок: @contest.NewSubmissionsCount</p>
+                            <a href="/Moderator/ContestItems/@contest.Id" class="btn-action">Смотреть заявки</a>
+                        </div>
+                    </article>
+                }
+            }
+            else
+            {
+                <div style="width:100%;text-align:center;padding:60px 20px;color:#7c8295;font-size:16px;">
+                    Нет конкурсов для модерации
                 </div>
-            </article>
-
-            <article class="contest-card">
-                <div class="contest-image-holder image-bg-pink"></div>
-                <div class="contest-card-content">
-                    <h2 class="contest-title">Цифровой портрет</h2>
-                    <p class="contest-info">Категория: Цифровой рисунок</p>
-                    <p class="contest-counter-alert">Новых заявок: 5</p>
-                    <a href="/Moderator/ContestItems" class="btn-action">Смотреть заявки</a>
-                </div>
-            </article>
-
+            }
         </section>
     </main>
 

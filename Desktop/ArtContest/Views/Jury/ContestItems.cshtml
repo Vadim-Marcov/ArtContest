@@ -1,3 +1,9 @@
+@model List<ArtContest.Models.Submission>
+@{
+    var contest = ViewBag.Contest as ArtContest.Models.Contest;
+    var assessedSubmissionIds = ViewBag.AssessedSubmissionIds as List<int> ?? new List<int>();
+}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -19,16 +25,15 @@
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
             </span>
-            Конкурс: Осенняя палитра
+            Конкурс: @(contest?.Title ?? "—")
         </a>
     </header>
 
     <main class="page-content">
-
         <section class="info-section">
             <h2 class="info-section-title">Правила и описание</h2>
             <div class="info-text-block">
-                <p>К участию в конкурсе «Осенняя палитра» принимаются авторские работы в категориях «Фотография» и «Цифровой рисунок». Ваша работа должна наиболее полно раскрывать тему красоты природы в осенний период, используя богатство теплых оттенков и уникальное освещение.</p>
+                <p>@(contest?.Rules ?? "Нет описания")</p>
             </div>
         </section>
 
@@ -46,29 +51,38 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><span class="work-name-td">Золотой рассвет</span></td>
-                            <td>Алексей П.</td>
-                            <td>10.10.2026</td>
-                            <td><a href="/Jury/Review" class="btn-table-action">Оценить</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="work-name-td">Туманный октябрь</span></td>
-                            <td>Мария И.</td>
-                            <td>09.10.2026</td>
-                            <td><a href="/Jury/Review" class="btn-table-action">Оценить</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="work-name-td">Рябиновый всплеск</span></td>
-                            <td>Игорь К.</td>
-                            <td>08.10.2026</td>
-                            <td><a href="/Jury/Review" class="btn-table-action">Оценить</a></td>
-                        </tr>
+                        @if (Model.Any())
+                        {
+                            @foreach (var submission in Model)
+                            {
+                                var isAssessed = assessedSubmissionIds.Contains(submission.Id);
+                                <tr>
+                                    <td><span class="work-name-td">@submission.Title</span></td>
+                                    <td>@submission.User?.Login</td>
+                                    <td>@submission.SubmissionDate</td>
+                                    <td>
+                                        @if (isAssessed)
+                                        {
+                                            <a href="/Jury/Review?submissionId=@submission.Id" class="btn-table-action" style="background-color:#00ca72;">Оценено</a>
+                                        }
+                                        else
+                                        {
+                                            <a href="/Jury/Review?submissionId=@submission.Id" class="btn-table-action">Оценить</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" style="text-align:center;padding:40px;color:#7c8295;">Нет одобренных заявок для оценки</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
         </section>
-
     </main>
 
 </body>

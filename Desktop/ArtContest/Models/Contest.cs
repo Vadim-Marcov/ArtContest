@@ -47,5 +47,8 @@ namespace ArtContest.Models
         [ForeignKey("Criteria2")]
         public int IdCriteria2 { get; set; }
         public Criteria2? Criteria2 { get; set; }
+
+        [NotMapped]
+        public int NewSubmissionsCount { get; set; }
     }
 }

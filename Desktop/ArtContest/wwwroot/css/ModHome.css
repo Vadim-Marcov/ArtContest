@@ -163,6 +163,33 @@ body {
     justify-content: center;
 }
 
+.search-icon-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #9a9fae;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.search-icon-btn:hover { color: #0f2c59; }
+.search-icon-btn svg { width: 18px; height: 18px; }
+
+.contest-image-holder {
+    height: 190px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 .select-wrapper {
     position: relative;
     width: 200px;

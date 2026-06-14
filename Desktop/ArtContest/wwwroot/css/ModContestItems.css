@@ -159,3 +159,11 @@ body {
 .btn-table-action:hover {
     background-color: #0a1f3f;
 }
+
+.contest-image-holder {
+    height: 190px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}

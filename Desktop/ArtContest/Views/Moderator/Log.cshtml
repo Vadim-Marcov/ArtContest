@@ -1,3 +1,4 @@
+@model List<ArtContest.Models.Submission>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -22,7 +23,7 @@
     <main class="main-content">
         <header class="content-header">
             <h1 class="page-title">Журнал модерации</h1>
-            <a href="/Auth/Login" class="logout-trigger">
+            <a href="/Auth/Login" class="logout-trigger" id="logoutBtn">
                 <span class="logout-text">Выйти</span>
                 <span class="logout-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -34,34 +35,46 @@
             </a>
         </header>
 
-        <section class="filters-container">
+        <form class="filters-container" method="get" action="/Moderator/Log">
             <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="Поиск работ">
-                <span class="search-icon">
+                <input type="text" name="search" class="search-input" placeholder="Поиск работ" value="@ViewBag.Search">
+                <button type="submit" class="search-icon-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                </span>
+                </button>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Конкурс</option>
-                    <option value="autumn">Осенняя палитра</option>
-                    <option value="digital">Цифровой портрет</option>
+                <select name="contest" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var logContestSel = string.IsNullOrEmpty(ViewBag.SelectedContest) ? "selected" : null;
+                    }
+                    <option value="" selected="@logContestSel">Конкурс</option>
+                    @foreach (var c in ViewBag.Contests as List<ArtContest.Models.Contest>)
+                    {
+                        var logContestItemSel = ViewBag.SelectedContest == c.Id.ToString() ? "selected" : null;
+                        <option value="@c.Id" selected="@logContestItemSel">@c.Title</option>
+                    }
                 </select>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Статус</option>
-                    <option value="approved">Одобрено</option>
-                    <option value="fix">На доработку</option>
-                    <option value="rejected">Отклонено</option>
+                <select name="status" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var logStatusAll = string.IsNullOrEmpty(ViewBag.SelectedStatus) ? "selected" : null;
+                        var logStatusApproved = ViewBag.SelectedStatus == "Одобрено" ? "selected" : null;
+                        var logStatusRejected = ViewBag.SelectedStatus == "Отклонено" ? "selected" : null;
+                        var logStatusFix = ViewBag.SelectedStatus == "На доработку" ? "selected" : null;
+                    }
+                    <option value="" selected="@logStatusAll">Статус</option>
+                    <option value="Одобрено" selected="@logStatusApproved">Одобрено</option>
+                    <option value="На доработку" selected="@logStatusFix">На доработку</option>
+                    <option value="Отклонено" selected="@logStatusRejected">Отклонено</option>
                 </select>
             </div>
-        </section>
+        </form>
 
         <section class="table-container">
             <table class="log-table">
@@ -76,42 +89,93 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><span class="work-name-td">Лесной ручей</span></td>
-                        <td>Сергей С.</td>
-                        <td>Осенняя палитра</td>
-                        <td class="date-td">10.06.2026</td>
-                        <td><span class="status-badge status-approved">Одобрено</span></td>
-                        <td class="comment-td">—</td>
-                    </tr>
-                    <tr>
-                        <td><span class="work-name-td">Абстрактный разум</span></td>
-                        <td>Дмитрий К.</td>
-                        <td>Цифровой портрет</td>
-                        <td class="date-td">09.06.2026</td>
-                        <td><span class="status-badge status-rejected">Отклонено</span></td>
-                        <td class="comment-td">Низкое разрешение изображения, сильное размытие на заднем плане.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="work-name-td">Осенний натюрморт</span></td>
-                        <td>Алексей С.</td>
-                        <td>Осенняя палитра</td>
-                        <td class="date-td">08.06.2026</td>
-                        <td><span class="status-badge status-fix">На доработку</span></td>
-                        <td class="comment-td">Пожалуйста, перезалейте изображение в более высоком разрешении (минимум 1200px).</td>
-                    </tr>
-                    <tr>
-                        <td><span class="work-name-td">Закат в горах</span></td>
-                        <td>Елена М.</td>
-                        <td>Осенняя палитра</td>
-                        <td class="date-td">05.06.2026</td>
-                        <td><span class="status-badge status-approved">Одобрено</span></td>
-                        <td class="comment-td">—</td>
-                    </tr>
+                    @if (Model.Any())
+                    {
+                        @foreach (var submission in Model)
+                        {
+                            <tr>
+                                <td><span class="work-name-td">@submission.Title</span></td>
+                                <td>@submission.User?.Login</td>
+                                <td>@submission.Contest?.Title</td>
+                                <td class="date-td">@(submission.ModeratorLog?.ResponseDate ?? "—")</td>
+                                <td>
+                                    @if (submission.ModeratorLog != null)
+                                    {
+                                        var logStatusClass = submission.ModeratorLog.Status switch
+                                        {
+                                            "Одобрено" => "status-approved",
+                                            "Отклонено" => "status-rejected",
+                                            "На доработку" => "status-fix",
+                                            _ => "status-pending"
+                                        };
+                                        <span class="status-badge @logStatusClass">@submission.ModeratorLog.Status</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-pending">—</span>
+                                    }
+                                </td>
+                                <td class="comment-td">@(string.IsNullOrEmpty(submission.ModeratorLog?.ModComment) ? "—" : submission.ModeratorLog.ModComment)</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" style="text-align:center;padding:40px;color:#7c8295;">Журнал модерации пуст</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </section>
     </main>
+
+    <div id="logoutModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.4);align-items:center;justify-content:center;z-index:1000;">
+        <div style="background:#fff;border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.15);">
+            <h3 style="font-size:20px;font-weight:700;color:#11142d;margin-bottom:15px;">Выход</h3>
+            <p style="font-size:15px;color:#555e75;margin-bottom:30px;">Вы уверены, что хотите выйти из аккаунта?</p>
+            <div style="display:flex;gap:15px;justify-content:center;">
+                <button style="padding:14px 30px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;border:none;background-color:#f6f7fb;color:#555e75;" id="logoutCancelBtn">Отмена</button>
+                <button style="padding:14px 30px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;border:none;background-color:#e84a4a;color:#ffffff;" id="logoutConfirmBtn">Выйти</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .search-icon-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9a9fae;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+        .search-icon-btn:hover { color: #0f2c59; }
+        .search-icon-btn svg { width: 18px; height: 18px; }
+    </style>
+
+    <script>
+        document.getElementById('logoutBtn').onclick = function(e) {
+            e.preventDefault();
+            document.getElementById('logoutModal').style.display = 'flex';
+        };
+        document.getElementById('logoutCancelBtn').onclick = function() {
+            document.getElementById('logoutModal').style.display = 'none';
+        };
+        document.getElementById('logoutConfirmBtn').onclick = function() {
+            window.location.href = '/Auth/Login';
+        };
+        document.getElementById('logoutModal').onclick = function(e) {
+            if (e.target === this) this.style.display = 'none';
+        };
+    </script>
 
 </body>
 </html>

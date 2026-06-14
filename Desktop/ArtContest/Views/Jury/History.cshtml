@@ -1,3 +1,4 @@
+@model List<ArtContest.Models.JuryAssessment>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -22,7 +23,7 @@
     <main class="main-content">
         <header class="content-header">
             <h1 class="page-title">История оценок</h1>
-            <a href="/Auth/Login" class="logout-trigger">
+            <a href="/Auth/Login" class="logout-trigger" id="logoutBtn">
                 <span class="logout-text">Выйти</span>
                 <span class="logout-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -34,33 +35,45 @@
             </a>
         </header>
 
-        <section class="filters-container">
+        <form class="filters-container" method="get" action="/Jury/History">
             <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="Поиск работ">
-                <span class="search-icon">
+                <input type="text" name="search" class="search-input" placeholder="Поиск работ" value="@ViewBag.Search">
+                <button type="submit" class="search-icon-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                </span>
+                </button>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Конкурс</option>
-                    <option value="autumn">Осенняя палитра</option>
-                    <option value="digital">Цифровой портрет</option>
+                <select name="contest" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var hContestSel = string.IsNullOrEmpty(ViewBag.SelectedContest) ? "selected" : null;
+                    }
+                    <option value="" selected="@hContestSel">Конкурс</option>
+                    @foreach (var c in ViewBag.Contests as List<ArtContest.Models.Contest>)
+                    {
+                        var hContestItemSel = ViewBag.SelectedContest == c.Id.ToString() ? "selected" : null;
+                        <option value="@c.Id" selected="@hContestItemSel">@c.Title</option>
+                    }
                 </select>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Категория</option>
-                    <option value="photo">Фотография</option>
-                    <option value="digital">Digital Art</option>
+                <select name="category" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var hCatSel = string.IsNullOrEmpty(ViewBag.SelectedCategory) ? "selected" : null;
+                    }
+                    <option value="" selected="@hCatSel">Категория</option>
+                    @foreach (var cat in ViewBag.Categories as List<ArtContest.Models.ContestCategory>)
+                    {
+                        var hCatItemSel = ViewBag.SelectedCategory == cat.Id.ToString() ? "selected" : null;
+                        <option value="@cat.Id" selected="@hCatItemSel">@cat.CategoryName</option>
+                    }
                 </select>
             </div>
-        </section>
+        </form>
 
         <section class="table-container">
             <table class="log-table">
@@ -75,34 +88,77 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><span class="work-name-td">Лесной ручей</span></td>
-                        <td>Сергей С.</td>
-                        <td>Осенняя палитра</td>
-                        <td><span class="score-cell">42 / 50</span></td>
-                        <td><span class="score-cell">45 / 50</span></td>
-                        <td class="comment-td">Прекрасная работа со светотенью и композицией.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="work-name-td">Абстрактный разум</span></td>
-                        <td>Дмитрий К.</td>
-                        <td>Цифровой портрет</td>
-                        <td><span class="score-cell">28 / 50</span></td>
-                        <td><span class="score-cell">31 / 50</span></td>
-                        <td class="comment-td">Интересная задумка, но анатомия лица требует детальной проработки.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="work-name-td">Закат в горах</span></td>
-                        <td>Елена М.</td>
-                        <td>Осенняя палитра</td>
-                        <td><span class="score-cell">50 / 50</span></td>
-                        <td><span class="score-cell">48 / 50</span></td>
-                        <td class="comment-td">Потрясающая детализация и глубина пространства.</td>
-                    </tr>
+                    @if (Model.Any())
+                    {
+                        @foreach (var assessment in Model)
+                        {
+                            <tr>
+                                <td><span class="work-name-td">@assessment.Submission?.Title</span></td>
+                                <td>@assessment.Submission?.User?.Login</td>
+                                <td>@assessment.Submission?.Contest?.Title</td>
+                                <td><span class="score-cell">@assessment.Score1 / 50</span></td>
+                                <td><span class="score-cell">@assessment.Score2 / 50</span></td>
+                                <td class="comment-td">@(string.IsNullOrEmpty(assessment.JuryComment) ? "—" : assessment.JuryComment)</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" style="text-align:center;padding:40px;color:#7c8295;">История оценок пуста</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </section>
     </main>
+
+    <div id="logoutModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.4);align-items:center;justify-content:center;z-index:1000;">
+        <div style="background:#fff;border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.15);">
+            <h3 style="font-size:20px;font-weight:700;color:#11142d;margin-bottom:15px;">Выход</h3>
+            <p style="font-size:15px;color:#555e75;margin-bottom:30px;">Вы уверены, что хотите выйти из аккаунта?</p>
+            <div style="display:flex;gap:15px;justify-content:center;">
+                <button style="padding:14px 30px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;border:none;background-color:#f6f7fb;color:#555e75;" id="logoutCancelBtn">Отмена</button>
+                <button style="padding:14px 30px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;border:none;background-color:#e84a4a;color:#ffffff;" id="logoutConfirmBtn">Выйти</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .search-icon-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9a9fae;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+        .search-icon-btn:hover { color: #0f2c59; }
+        .search-icon-btn svg { width: 18px; height: 18px; }
+    </style>
+
+    <script>
+        document.getElementById('logoutBtn').onclick = function(e) {
+            e.preventDefault();
+            document.getElementById('logoutModal').style.display = 'flex';
+        };
+        document.getElementById('logoutCancelBtn').onclick = function() {
+            document.getElementById('logoutModal').style.display = 'none';
+        };
+        document.getElementById('logoutConfirmBtn').onclick = function() {
+            window.location.href = '/Auth/Login';
+        };
+        document.getElementById('logoutModal').onclick = function(e) {
+            if (e.target === this) this.style.display = 'none';
+        };
+    </script>
 
 </body>
 </html>

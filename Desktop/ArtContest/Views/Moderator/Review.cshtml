@@ -1,3 +1,7 @@
+@{
+    var submission = ViewBag.Submission as ArtContest.Models.Submission;
+}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -12,57 +16,143 @@
 <body>
 
     <header class="top-bar">
-        <a href="/Moderator/ContestItems" class="back-link">
+        <a href="/Moderator/ContestItems/@submission?.Contest?.Id" class="back-link">
             <span class="back-arrow">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
             </span>
-            Проверка: «Золотой рассвет» (Автор: Алексей П.)
+            Проверка: «@submission?.Title» (Автор: @submission?.User?.Login)
         </a>
     </header>
 
     <main class="submit-page-content">
 
-        <section class="info-section">
-            <h2 class="info-section-title">Описание работы</h2>
-            <div class="info-text-block">
-                <p>К участию в конкурсе «Осенняя палитра» принимаются авторские работы в категориях «Фотография» и «Цифровой рисунок». Ваша работа должна наиболее полно раскрывать тему красоты природы в осенний период, используя богатство теплых оттенков и уникальное освещение.</p>
-            </div>
-        </section>
+        @if (ViewBag.Success != null)
+        {
+            <div class="success-message">@ViewBag.Success</div>
+        }
+        @if (ViewBag.Error != null)
+        {
+            <div class="form-error-message">@ViewBag.Error</div>
+        }
 
-        <div class="submission-grid">
-
-            <div class="upload-container">
-                <div class="upload-dropzone">
-                    <div class="upload-prompt">
-                        <p class="main-prompt">[Изображение работы]</p>
-                    </div>
+        @if (submission != null)
+        {
+            <section class="info-section">
+                <h2 class="info-section-title">Описание работы</h2>
+                <div class="info-text-block">
+                    <p>@(submission.AuthorDescription ?? "Описание отсутствует")</p>
                 </div>
+            </section>
+
+            <div class="submission-grid">
+                <div class="upload-container">
+                    @if (!string.IsNullOrEmpty(submission.SubmissionImage))
+                    {
+                        <div class="upload-dropzone" style="border-style:solid;">
+                            <div class="upload-prompt">
+                                <img src="@Url.Content("~/images/" + submission.SubmissionImage)" alt="@submission.Title" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;" />
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="upload-dropzone">
+                            <div class="upload-prompt">
+                                <p class="main-prompt">[Изображение работы]</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <aside class="submission-form">
+                    <form class="form-card" method="post" action="/Moderator/Review" onsubmit="return validateReviewForm()">
+                        <input type="hidden" name="submissionId" value="@submission.Id" />
+
+                        <h2 class="form-card-title">Вердикт</h2>
+
+                        <input type="hidden" name="status" id="verdictStatus" />
+
+                        <div class="buttons-verdict-vertical">
+                            <button type="button" class="btn-verdict btn-approve" onclick="setVerdict('Одобрить')">Одобрить</button>
+                            <button type="button" class="btn-verdict btn-fix" onclick="setVerdict('На доработку')">На доработку</button>
+                            <button type="button" class="btn-verdict btn-reject" onclick="setVerdict('Отклонено')">Отклонить</button>
+                        </div>
+                        <p id="selectedVerdict" style="text-align:center;font-size:14px;font-weight:600;color:#11142d;margin-top:10px;min-height:20px;"></p>
+
+                        <div class="input-field-group">
+                            <label class="input-label">Комментарий для участника</label>
+                            <textarea name="comment" class="text-area-input" placeholder="Введите комментарий" rows="5" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit-work">Сохранить статус</button>
+                    </form>
+
+                    @if (submission.ModeratorLog != null)
+                    {
+                        <div class="mod-log-info" style="margin-top:20px;padding:15px;background:#f6f7fb;border-radius:12px;">
+                            <p style="font-size:13px;font-weight:600;color:#7c8295;margin-bottom:8px;">Предыдущее решение:</p>
+                            <p style="font-size:14px;font-weight:700;color:#11142d;">@submission.ModeratorLog.Status</p>
+                            <p style="font-size:13px;color:#555e75;">@(string.IsNullOrEmpty(submission.ModeratorLog.ModComment) ? "—" : submission.ModeratorLog.ModComment)</p>
+                            <p style="font-size:12px;color:#9a9fae;margin-top:8px;">@submission.ModeratorLog.ResponseDate</p>
+                        </div>
+                    }
+                </aside>
             </div>
-
-            <aside class="submission-form">
-                <form class="form-card">
-                    <h2 class="form-card-title">Вердикт</h2>
-
-                    <div class="buttons-verdict-vertical">
-                        <button type="button" class="btn-verdict btn-approve">Одобрить</button>
-                        <button type="button" class="btn-verdict btn-fix">На доработку</button>
-                        <button type="button" class="btn-verdict btn-reject">Отклонить</button>
-                    </div>
-
-                    <div class="input-field-group">
-                        <label class="input-label">Комментарий для участника</label>
-                        <textarea class="text-area-input" placeholder="Комментарий" rows="5" required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn-submit-work">Сохранить статус</button>
-                </form>
-            </aside>
-
-        </div>
+        }
+        else
+        {
+            <div style="text-align:center;padding:80px 20px;color:#7c8295;">
+                Заявка не найдена
+            </div>
+        }
     </main>
+
+    <script>
+        function setVerdict(status) {
+            document.getElementById('verdictStatus').value = status;
+            document.getElementById('selectedVerdict').textContent = status;
+            document.querySelectorAll('.btn-verdict').forEach(function(btn) {
+                btn.style.opacity = '0.5';
+            });
+            if (status === 'Одобрить') document.querySelector('.btn-approve').style.opacity = '1';
+            if (status === 'На доработку') document.querySelector('.btn-fix').style.opacity = '1';
+            if (status === 'Отклонено') document.querySelector('.btn-reject').style.opacity = '1';
+        }
+
+        function validateReviewForm() {
+            var status = document.getElementById('verdictStatus').value;
+            var comment = document.querySelector('[name="comment"]').value.trim();
+            if (!status) { alert('Выберите решение'); return false; }
+            if (!comment) { alert('Введите комментарий'); return false; }
+            return true;
+        }
+    </script>
+
+    <style>
+        .form-error-message {
+            background-color: #ffe5e5;
+            color: #ff4d4d;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .success-message {
+            background-color: #e1fcef;
+            color: #00ca72;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
 
 </body>
 </html>

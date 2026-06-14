@@ -1,3 +1,8 @@
+@{
+    var submission = ViewBag.Submission as ArtContest.Models.Submission;
+    var existingAssessment = ViewBag.ExistingAssessment as ArtContest.Models.JuryAssessment;
+}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -12,58 +17,111 @@
 <body>
 
     <header class="top-bar">
-        <a href="/Jury/ContestItems" class="back-link">
+        <a href="/Jury/ContestItems/@submission?.Contest?.Id" class="back-link">
             <span class="back-arrow">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
             </span>
-            Работа: «Золотой рассвет» (Автор: Алексей П.)
+            Работа: «@submission?.Title» (Автор: @submission?.User?.Login)
         </a>
     </header>
 
     <main class="submit-page-content">
-        <section class="info-section">
-            <h2 class="info-section-title">Описание работы</h2>
-            <div class="info-text-block">
-                <p>К участию в конкурсе «Осенняя палитра» принимаются авторские работы в категориях «Фотография» и «Цифровой рисунок». Ваша работа должна наиболее полно раскрывать тему красоты природы в осенний период, используя богатство теплых оттенков и уникальное освещение.</p>
-            </div>
-        </section>
+        @if (ViewBag.Success != null)
+        {
+            <div class="success-message">@ViewBag.Success</div>
+        }
+        @if (ViewBag.Error != null)
+        {
+            <div class="form-error-message">@ViewBag.Error</div>
+        }
 
-        <div class="submission-grid">
-            <div class="upload-container">
-                <div class="upload-dropzone">
-                    <div class="upload-prompt">
-                        <p class="main-prompt">[Изображение работы]</p>
-                    </div>
+        @if (submission != null)
+        {
+            <section class="info-section">
+                <h2 class="info-section-title">Описание работы</h2>
+                <div class="info-text-block">
+                    <p>@(submission.AuthorDescription ?? "Описание отсутствует")</p>
                 </div>
-            </div>
+            </section>
 
-            <form class="submission-form">
-                <div class="form-card">
-                    <h2 class="form-card-title">Выставление оценки</h2>
-
-                    <div class="input-field-group">
-                        <label class="input-label">Техника исполнения (0-50)</label>
-                        <input type="number" class="text-input" placeholder="Введите балл" min="0" max="50" required>
-                    </div>
-
-                    <div class="input-field-group">
-                        <label class="input-label">Оригинальность (0-50)</label>
-                        <input type="number" class="text-input" placeholder="Введите балл" min="0" max="50" required>
-                    </div>
-
-                    <div class="input-field-group">
-                        <label class="input-label">Комментарий (Отзыв)</label>
-                        <textarea class="text-area-input" placeholder="Напишите ваш отзыв участнику" rows="5" required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn-submit-work">Сохранить оценку</button>
+            <div class="submission-grid">
+                <div class="upload-container">
+                    @if (!string.IsNullOrEmpty(submission.SubmissionImage))
+                    {
+                        <div class="upload-dropzone" style="border-style:solid;">
+                            <div class="upload-prompt">
+                                <img src="@Url.Content("~/images/" + submission.SubmissionImage)" alt="@submission.Title" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;" />
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="upload-dropzone">
+                            <div class="upload-prompt">
+                                <p class="main-prompt">[Изображение работы]</p>
+                            </div>
+                        </div>
+                    }
                 </div>
-            </form>
-        </div>
+
+                <form class="submission-form" method="post" action="/Jury/Review">
+                    <input type="hidden" name="submissionId" value="@submission.Id" />
+                    <div class="form-card">
+                        <h2 class="form-card-title">Выставление оценки</h2>
+
+                        <div class="input-field-group">
+                            <label class="input-label">@(submission.Contest?.Criteria1?.Criteria1Name ?? "Критерий 1") (0-50)</label>
+                            <input type="number" name="score1" class="text-input" placeholder="Введите балл" min="0" max="50" required value="@(existingAssessment?.Score1.ToString() ?? "")">
+                        </div>
+
+                        <div class="input-field-group">
+                            <label class="input-label">@(submission.Contest?.Criteria2?.Criteria2Name ?? "Критерий 2") (0-50)</label>
+                            <input type="number" name="score2" class="text-input" placeholder="Введите балл" min="0" max="50" required value="@(existingAssessment?.Score2.ToString() ?? "")">
+                        </div>
+
+                        <div class="input-field-group">
+                            <label class="input-label">Комментарий (Отзыв)</label>
+                            <textarea name="juryComment" class="text-area-input" placeholder="Напишите ваш отзыв участнику" rows="5" required>@(existingAssessment?.JuryComment ?? "")</textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit-work">@(existingAssessment != null ? "Обновить оценку" : "Сохранить оценку")</button>
+                    </div>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center;padding:80px 20px;color:#7c8295;">
+                Работа не найдена
+            </div>
+        }
     </main>
+
+    <style>
+        .form-error-message {
+            background-color: #ffe5e5;
+            color: #ff4d4d;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .success-message {
+            background-color: #e1fcef;
+            color: #00ca72;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
 
 </body>
 </html>

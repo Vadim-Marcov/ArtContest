@@ -252,3 +252,4 @@ C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\refint\ArtContest.dll
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.pdb
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.genruntimeconfig.cache
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ref\ArtContest.dll
+C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.sourcelink.json

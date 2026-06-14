@@ -1,3 +1,4 @@
+@model ArtContest.Controllers.AdminCreateContestViewModel
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -25,23 +26,30 @@
 
     <main class="create-contest-content">
         <div class="form-wrapper-card">
-            <form class="create-contest-form">
+            <form class="create-contest-form" method="post" action="/Admin/CreateContest" enctype="multipart/form-data" onsubmit="return validateForm()">
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="form-error-message">@ViewBag.Error</div>
+                }
 
                 <div class="form-grid-layout">
 
                     <div class="form-fields-column">
                         <div class="input-field-group">
                             <label class="input-label">Название конкурса</label>
-                            <input type="text" class="text-input" placeholder="Введите название" required>
+                            <input type="text" name="title" class="text-input" placeholder="Введите название" required minlength="3" maxlength="200">
                         </div>
 
                         <div class="input-field-group">
                             <label class="input-label">Категория</label>
                             <div class="select-wrapper">
-                                <select class="custom-select" required>
+                                <select name="category" class="custom-select" required>
                                     <option value="" disabled selected hidden>Выберите категорию</option>
-                                    <option value="photo">Фотография</option>
-                                    <option value="digital">Цифровой рисунок</option>
+                                    @foreach (var cat in Model.Categories)
+                                    {
+                                        <option value="@cat.Id">@cat.CategoryName</option>
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -49,9 +57,12 @@
                         <div class="input-field-group">
                             <label class="input-label">Критерий оценки 1</label>
                             <div class="select-wrapper">
-                                <select class="custom-select" required>
+                                <select name="criteria1" class="custom-select" required>
                                     <option value="" disabled selected hidden>Выберите критерий</option>
-                                    <option value="technique">Техника исполнения (0-50)</option>
+                                    @foreach (var c in Model.Criteria1List)
+                                    {
+                                        <option value="@c.Id">@c.Criteria1Name</option>
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -59,20 +70,23 @@
                         <div class="input-field-group">
                             <label class="input-label">Критерий оценки 2</label>
                             <div class="select-wrapper">
-                                <select class="custom-select" required>
+                                <select name="criteria2" class="custom-select" required>
                                     <option value="" disabled selected hidden>Выберите критерий</option>
-                                    <option value="originality">Оригинальность (0-50)</option>
+                                    @foreach (var c in Model.Criteria2List)
+                                    {
+                                        <option value="@c.Id">@c.Criteria2Name</option>
+                                    }
                                 </select>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-image-column">
-                        <label class="input-label">Изображение конкурса</label>
+                        <label class="input-label">Изображение конкурса *</label>
                         <div class="upload-container">
-                            <input type="file" id="contest-image-upload" accept="image/png, image/jpeg" hidden>
-                            <label for="contest-image-upload" class="upload-dropzone">
-                                <div class="upload-prompt">
+                            <input type="file" id="contest-image-upload" name="contestImage" accept="image/png, image/jpeg" class="file-input-hidden">
+                            <label for="contest-image-upload" class="upload-dropzone" id="dropzone-label">
+                                <div class="upload-prompt" id="uploadPrompt">
                                     <p class="main-prompt">Перетащите файл сюда</p>
                                     <p class="sub-prompt">JPG, PNG до 10MB</p>
                                 </div>
@@ -84,25 +98,25 @@
 
                 <div class="input-field-group full-width-group">
                     <label class="input-label">Правила и описание</label>
-                    <textarea class="text-area-input" placeholder="Добавьте требования" rows="3" required></textarea>
+                    <textarea name="rules" class="text-area-input" placeholder="Добавьте требования" rows="3" required minlength="10" maxlength="5000"></textarea>
                 </div>
 
                 <div class="date-ranges-row">
                     <div class="date-range-item">
                         <label class="input-label">Прием заявок (С - По)</label>
                         <div class="date-inputs-wrapper">
-                            <input type="text" class="date-input-field" placeholder="00.00.0000" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <input type="date" name="appStartDate" id="appStartDate" class="date-input-field" required>
                             <span class="date-separator">—</span>
-                            <input type="text" class="date-input-field" placeholder="00.00.0000" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <input type="date" name="appEndDate" id="appEndDate" class="date-input-field" required>
                         </div>
                     </div>
 
                     <div class="date-range-item">
                         <label class="input-label">Этап судейства (С - По)</label>
                         <div class="date-inputs-wrapper">
-                            <input type="text" class="date-input-field" placeholder="00.00.0000" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <input type="date" name="judStartDate" id="judStartDate" class="date-input-field" required>
                             <span class="date-separator">—</span>
-                            <input type="text" class="date-input-field" placeholder="00.00.0000" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <input type="date" name="judEndDate" id="judEndDate" class="date-input-field" required>
                         </div>
                     </div>
                 </div>
@@ -112,6 +126,8 @@
             </form>
         </div>
     </main>
+
+    <script src="~/js/admin-contest-form.js"></script>
 
 </body>
 </html>

@@ -1,3 +1,4 @@
+@model ArtContest.Controllers.AdminContestsViewModel
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -28,50 +29,95 @@
         </header>
 
         <section class="contests-list-container">
+            @foreach (var contest in Model.Contests)
+            {
+                var appPeriod = contest.ApplicationPeriod;
+                var judPeriod = contest.JudgingPeriod;
+                var currentStage = contest.IdStage;
 
-            <article class="contest-management-card">
-                <div class="card-body-layout">
+                var appStart = appPeriod != null ? DateTime.Parse(appPeriod.AppStartDate) : DateTime.MinValue;
+                var appEnd = appPeriod != null ? DateTime.Parse(appPeriod.AppEndDate) : DateTime.MinValue;
+                var judStart = judPeriod != null ? DateTime.Parse(judPeriod.JudStartDate) : DateTime.MinValue;
+                var judEnd = judPeriod != null ? DateTime.Parse(judPeriod.JudEndDate) : DateTime.MinValue;
+                var now = DateTime.Now;
 
-                    <div class="contest-timeline-block">
-                        <h2 class="contest-card-title">Осенняя палитра 2026</h2>
+                double progressPercent = 0;
+                if (currentStage == 4)
+                {
+                    progressPercent = 100;
+                }
+                else if (appPeriod != null && judPeriod != null)
+                {
+                    var totalDays = (judEnd - appStart).TotalDays;
+                    var elapsed = (now - appStart).TotalDays;
+                    if (totalDays > 0)
+                    {
+                        progressPercent = Math.Min(95, Math.Max(5, Math.Round((elapsed / totalDays) * 100) / 10 * 10));
+                    }
+                }
+                else if (currentStage == 2)
+                {
+                    progressPercent = 35;
+                }
+                else if (currentStage == 3)
+                {
+                    progressPercent = 70;
+                }
 
-                        <div class="timeline-wrapper">
-                            <p class="timeline-header-label">ВРЕМЕННЫЕ ЭТАПЫ:</p>
+                var stage1Done = currentStage >= 2 || (appPeriod != null && now > appEnd);
+                var stage2Done = currentStage >= 3 || (judPeriod != null && now > judStart);
+                var stage3Done = currentStage >= 4 || (judPeriod != null && now > judEnd);
 
-                            <div class="timeline-track-container">
-                                <div class="timeline-line-progress"></div>
+                <article class="contest-management-card">
+                    <div class="card-body-layout">
 
-                                <div class="timeline-nodes">
-                                    <div class="timeline-node done">
-                                        <div class="node-dot"></div>
-                                        <span class="node-title">Прием заявок</span>
-                                        <span class="node-date">01.03 - 15.04</span>
-                                    </div>
+                        <div class="contest-timeline-block">
+                            <h2 class="contest-card-title">@contest.Title</h2>
 
-                                    <div class="timeline-node">
-                                        <div class="node-dot"></div>
-                                        <span class="node-title">Этап судейства</span>
-                                        <span class="node-date">16.04 - 25.04</span>
-                                    </div>
+                            <div class="timeline-wrapper">
+                                <p class="timeline-header-label">ВРЕМЕННЫЕ ЭТАПЫ:</p>
 
-                                    <div class="timeline-node">
-                                        <div class="node-dot"></div>
-                                        <span class="node-title">Итоги</span>
-                                        <span class="node-date">26.04.2026</span>
+                                <div class="timeline-track-container">
+                                    <div class="timeline-line-progress" style="width: @progressPercent%;"></div>
+
+                                    <div class="timeline-nodes">
+                                        <div class="timeline-node @(stage1Done ? "done" : "")">
+                                            <div class="node-dot"></div>
+                                            <span class="node-title">Прием заявок</span>
+                                            <span class="node-date">@(appPeriod != null ? appStart.ToString("dd.MM") + " - " + appEnd.ToString("dd.MM") : "—")</span>
+                                        </div>
+
+                                        <div class="timeline-node @(stage2Done ? "done" : "")">
+                                            <div class="node-dot"></div>
+                                            <span class="node-title">Этап судейства</span>
+                                            <span class="node-date">@(judPeriod != null ? judStart.ToString("dd.MM") + " - " + judEnd.ToString("dd.MM") : "—")</span>
+                                        </div>
+
+                                        <div class="timeline-node @(stage3Done ? "done" : "")">
+                                            <div class="node-dot"></div>
+                                            <span class="node-title">Итоги</span>
+                                            <span class="node-date">@(judPeriod != null ? judEnd.ToString("dd.MM.yyyy") : "—")</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                        </div>
+
+                        <div class="card-action-block">
+                            <a href="/Admin/EditContest/@contest.Id" class="btn-card-edit">Редактировать</a>
                         </div>
 
                     </div>
+                </article>
+            }
 
-                    <div class="card-action-block">
-                        <a href="/Admin/EditContest" class="btn-card-edit">Редактировать</a>
-                    </div>
-
+            @if (!Model.Contests.Any())
+            {
+                <div class="empty-state">
+                    <p>Конкурсов пока нет. Создайте первый!</p>
                 </div>
-            </article>
-
+            }
         </section>
     </main>
 

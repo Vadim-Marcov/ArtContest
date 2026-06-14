@@ -1,3 +1,9 @@
+@model ArtContest.Controllers.AdminUsersViewModel
+@{
+    var adminLogin = ViewBag.AdminLogin ?? "—";
+    var selectedRole = Model.SelectedRole;
+    var sort = Model.Sort;
+}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -24,7 +30,7 @@
 
         <header class="content-header">
             <h1 class="page-title">База пользователей</h1>
-            <a href="/Auth/Login" class="logout-trigger">
+            <a href="#" class="logout-trigger" id="logoutBtn">
                 <span class="logout-text">Выйти</span>
                 <span class="logout-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -36,35 +42,35 @@
             </a>
         </header>
 
-        <section class="filters-container">
+        <form class="filters-container" method="get" action="/Admin/Users" id="filterForm">
             <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="Поиск по логину или почте">
-                <span class="search-icon">
+                <input type="text" name="search" class="search-input" placeholder="Поиск по логину или почте" value="@Model.Search">
+                <button type="submit" class="search-icon-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                </span>
+                </button>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Роль: Все</option>
-                    <option value="admin">Администратор</option>
-                    <option value="participant">Участник</option>
-                    <option value="jury">Член жюри</option>
-                    <option value="moderator">Модератор</option>
+                <select name="role" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+                    <!option value="" @(string.IsNullOrEmpty(selectedRole) ? "selected" : "")>Роль: Все</!option>
+                    @foreach (var role in Model.Roles)
+                    {
+                        <!option value="@role.Id" @(selectedRole == role.Id.ToString() ? "selected" : "")>@role.RoleName</!option>
+                    }
                 </select>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Сначала новые</option>
-                    <option value="old">Сначала старые</option>
-                    <option value="alphabet">По алфавиту</option>
+                <select name="sort" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+                    <!option value="new" @(sort == "new" ? "selected" : "")>Сначала новые</!option>
+                    <!option value="old" @(sort == "old" ? "selected" : "")>Сначала старые</!option>
+                    <!option value="alphabet" @(sort == "alphabet" ? "selected" : "")>По алфавиту</!option>
                 </select>
             </div>
-        </section>
+        </form>
 
         <section class="table-container">
             <table class="log-table">
@@ -76,73 +82,72 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <div class="user-info-cell">
-                                <span class="user-name-title">Алексей Смирнов</span>
-                                <span class="user-email-subtitle">example1@gmail.com</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="table-select-wrapper size-participant">
-                                <select class="role-table-select text-participant">
-                                    <option value="participant" selected>Участник</option>
-                                    <option value="jury">Член жюри</option>
-                                    <option value="moderator">Модератор</option>
-                                    <option value="admin">Администратор</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td class="text-right">
-                            <button type="button" class="btn-table-delete">Удалить</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-info-cell">
-                                <span class="user-name-title">Иван Иванов</span>
-                                <span class="user-email-subtitle">example2@gmail.com</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="table-select-wrapper size-jury">
-                                <select class="role-table-select text-jury">
-                                    <option value="participant">Участник</option>
-                                    <option value="jury" selected>Член жюри</option>
-                                    <option value="moderator">Модератор</option>
-                                    <option value="admin">Администратор</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td class="text-right">
-                            <button type="button" class="btn-table-delete">Удалить</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-info-cell">
-                                <span class="user-name-title">Анна Модана</span>
-                                <span class="user-email-subtitle">example3@gmail.com</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="table-select-wrapper size-moderator">
-                                <select class="role-table-select text-moderator">
-                                    <option value="participant">Участник</option>
-                                    <option value="jury">Член жюри</option>
-                                    <option value="moderator" selected>Модератор</option>
-                                    <option value="admin">Администратор</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td class="text-right">
-                            <button type="button" class="btn-table-delete">Удалить</button>
-                        </td>
-                    </tr>
+                    @foreach (var user in Model.Users)
+                    {
+                        var roleClass = user.IdRole switch
+                        {
+                            1 => "size-admin text-admin",
+                            2 => "size-moderator text-moderator",
+                            3 => "size-jury text-jury",
+                            _ => "size-participant text-participant"
+                        };
+
+                        <tr id="user-row-@user.Id">
+                            <td>
+                                <div class="user-info-cell">
+                                    <span class="user-name-title">@user.Login</span>
+                                    <span class="user-email-subtitle">@user.Email</span>
+                                </div>
+                            </td>
+                            <td>
+                                @{
+                                    var isCurrentAdmin = user.Login == adminLogin;
+                                }
+                                @if (isCurrentAdmin)
+                                {
+                                    <div class="table-select-wrapper size-admin text-admin">
+                                        <select class="role-table-select" disabled>
+                                            <option selected>Администратор</option>
+                                        </select>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="table-select-wrapper @roleClass" id="role-wrapper-@user.Id">
+                                        <select class="role-table-select" onchange="changeRole(@user.Id, this.value)">
+                                            @foreach (var role in Model.Roles)
+                                            {
+                                                <!option value="@role.Id" @(user.IdRole == role.Id ? "selected" : "")>@role.RoleName</!option>
+                                            }
+                                        </select>
+                                    </div>
+                                }
+                            </td>
+                            <td class="text-right">
+                                @if (!isCurrentAdmin)
+                                {
+                                    <button type="button" class="btn-table-delete" onclick="confirmDelete(@user.Id, '@user.Login')">Удалить</button>
+                                }
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </section>
     </main>
+
+    <div id="modalOverlay" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <h3 class="modal-title" id="modalTitle">Подтверждение</h3>
+            <p class="modal-text" id="modalText">Вы уверены?</p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Отмена</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/admin-users.js"></script>
 
 </body>
 </html>

@@ -134,3 +134,18 @@ body {
     margin-bottom: 20px;
     text-align: center;
 }
+
+.input-error {
+    border-color: #ff4d4d !important;
+    background-color: #fff5f5 !important;
+}
+
+.field-error-text {
+    display: block;
+    color: #ff4d4d;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
+    text-align: left;
+    padding-left: 4px;
+}

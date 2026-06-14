@@ -1,3 +1,10 @@
+@model ArtContest.Controllers.AdminEditContestViewModel
+@using System.Text.Json
+@{
+    var adminLogin = ViewBag.AdminLogin ?? "—";
+    var ctJson = JsonSerializer.Serialize(Model.Contest.Title);
+    var cid = Model.Contest.Id;
+}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -25,22 +32,30 @@
 
     <main class="create-contest-content">
         <div class="form-wrapper-card">
-            <form class="create-contest-form">
+            <form class="create-contest-form" method="post" action="/Admin/EditContest/@Model.Contest.Id" enctype="multipart/form-data" onsubmit="return validateForm()">
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="form-error-message">@ViewBag.Error</div>
+                }
 
                 <div class="form-grid-layout">
 
                     <div class="form-fields-column">
                         <div class="input-field-group">
                             <label class="input-label">Название конкурса</label>
-                            <input type="text" class="text-input" value="Осенняя палитра 2026" required>
+                            <input type="text" name="title" class="text-input" value="@Model.Contest.Title" required minlength="3" maxlength="200">
                         </div>
 
                         <div class="input-field-group">
                             <label class="input-label">Категория</label>
                             <div class="select-wrapper">
-                                <select class="custom-select" required>
-                                    <option value="photo" selected>Фотография</option>
-                                    <option value="digital">Цифровой рисунок</option>
+                                <select name="category" class="custom-select" required>
+                                    @foreach (var cat in Model.Categories)
+                                    {
+                                        var sel = Model.Contest.IdCategory == cat.Id ? "selected" : null;
+                                        <option value="@cat.Id" selected="@sel">@cat.CategoryName</option>
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -48,8 +63,12 @@
                         <div class="input-field-group">
                             <label class="input-label">Критерий оценки 1</label>
                             <div class="select-wrapper">
-                                <select class="custom-select" required>
-                                    <option value="technique" selected>Техника исполнения</option>
+                                <select name="criteria1" class="custom-select" required>
+                                    @foreach (var c in Model.Criteria1List)
+                                    {
+                                        var sel1 = Model.Contest.IdCriteria1 == c.Id ? "selected" : null;
+                                        <option value="@c.Id" selected="@sel1">@c.Criteria1Name</option>
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -57,8 +76,12 @@
                         <div class="input-field-group">
                             <label class="input-label">Критерий оценки 2</label>
                             <div class="select-wrapper">
-                                <select class="custom-select" required>
-                                    <option value="originality" selected>Оригинальность</option>
+                                <select name="criteria2" class="custom-select" required>
+                                    @foreach (var c in Model.Criteria2List)
+                                    {
+                                        var sel2 = Model.Contest.IdCriteria2 == c.Id ? "selected" : null;
+                                        <option value="@c.Id" selected="@sel2">@c.Criteria2Name</option>
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -67,11 +90,16 @@
                     <div class="form-image-column">
                         <label class="input-label">Изображение конкурса</label>
                         <div class="upload-container">
-                            <input type="file" id="contest-image-upload" accept="image/png, image/jpeg" hidden>
-                            <label for="contest-image-upload" class="upload-dropzone filled-dropzone">
-                                <div class="upload-prompt">
-                                    <p class="image-placeholder-text">[Изображение работы]</p>
+                            <input type="file" id="contest-image-upload" name="contestImage" accept="image/png, image/jpeg" class="file-input-hidden">
+                            <label for="contest-image-upload" class="upload-dropzone @(string.IsNullOrEmpty(Model.Contest.ContestImage) ? "" : "has-image")" id="dropzone-label">
+                                <div class="upload-prompt" id="uploadPrompt" @(string.IsNullOrEmpty(Model.Contest.ContestImage) ? "" : "style=display:none;")>
+                                    <p class="main-prompt">Нажмите для выбора нового файла</p>
+                                    <p class="sub-prompt">JPG, PNG до 10MB</p>
                                 </div>
+                                @if (!string.IsNullOrEmpty(Model.Contest.ContestImage))
+                                {
+                                    <img src="@Url.Content("~/images/" + Model.Contest.ContestImage)" alt="" />
+                                }
                             </label>
                         </div>
                     </div>
@@ -80,37 +108,73 @@
 
                 <div class="input-field-group full-width-group">
                     <label class="input-label">Правила и описание</label>
-                    <textarea class="text-area-input" rows="3" required>Принимаются работы в осенней тематике...</textarea>
+                    <textarea name="rules" class="text-area-input" rows="3" required minlength="10" maxlength="5000">@Model.Contest.Rules</textarea>
                 </div>
 
                 <div class="date-ranges-row">
                     <div class="date-range-item">
                         <label class="input-label">Прием заявок (С - По)</label>
                         <div class="date-inputs-wrapper">
-                            <input type="text" class="date-input-field disabled-date" value="01.03.2026" disabled>
+                            <input type="date" name="appStartDate" id="appStartDate" class="date-input-field @(Model.AppStartPassed ? "disabled-date" : "")" value="@(Model.Contest.ApplicationPeriod?.AppStartDate)" @(Model.AppStartPassed ? "disabled" : "")>
                             <span class="date-separator">—</span>
-                            <input type="text" class="date-input-field" value="15.04.2026" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <input type="date" name="appEndDate" id="appEndDate" class="date-input-field @(Model.AppEndPassed ? "disabled-date" : "")" value="@(Model.Contest.ApplicationPeriod?.AppEndDate)" @(Model.AppEndPassed ? "disabled" : "")>
                         </div>
                     </div>
 
                     <div class="date-range-item">
                         <label class="input-label">Этап судейства (С - По)</label>
                         <div class="date-inputs-wrapper">
-                            <input type="text" class="date-input-field" value="16.04.2026" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <input type="date" name="judStartDate" id="judStartDate" class="date-input-field @(Model.JudStartPassed ? "disabled-date" : "")" value="@(Model.Contest.JudgingPeriod?.JudStartDate)" @(Model.JudStartPassed ? "disabled" : "")>
                             <span class="date-separator">—</span>
-                            <input type="text" class="date-input-field" value="25.04.2026" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <input type="date" name="judEndDate" id="judEndDate" class="date-input-field" value="@(Model.Contest.JudgingPeriod?.JudEndDate)">
                         </div>
                     </div>
                 </div>
 
                 <div class="edit-actions-row">
                     <button type="submit" class="btn-save-changes">Сохранить изменения</button>
-                    <button type="button" class="btn-delete-contest">Удалить конкурс</button>
+                    <button type="button" class="btn-delete-contest" id="btnDeleteContest">Удалить конкурс</button>
                 </div>
 
             </form>
         </div>
     </main>
+
+    <div id="modalOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.4);align-items:center;justify-content:center;z-index:1000;">
+        <div style="background:#fff;border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.15);">
+            <h3 style="font-size:20px;font-weight:700;color:#11142d;margin-bottom:15px;">Удаление конкурса</h3>
+            <p style="font-size:15px;color:#555e75;margin-bottom:30px;" id="modalText">Вы уверены?</p>
+            <div style="display:flex;gap:15px;justify-content:center;">
+                <button style="padding:14px 30px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;border:none;background-color:#f6f7fb;color:#555e75;" id="btnModalCancel">Отмена</button>
+                <button style="padding:14px 30px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;border:none;background-color:#e84a4a;color:#ffffff;" id="btnModalConfirm">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/admin-contest-form.js"></script>
+    <script>
+        var _cid = @cid;
+        var _ct = @Html.Raw(ctJson);
+
+        document.getElementById('btnDeleteContest').onclick = function () {
+            document.getElementById('modalText').textContent = 'Вы уверены, что хотите удалить конкурс "' + _ct + '"? Это действие нельзя отменить.';
+            var overlay = document.getElementById('modalOverlay');
+            overlay.style.display = 'flex';
+        };
+        document.getElementById('btnModalCancel').onclick = function () {
+            document.getElementById('modalOverlay').style.display = 'none';
+        };
+        document.getElementById('btnModalConfirm').onclick = function () {
+            var f = document.createElement('form');
+            f.method = 'POST';
+            f.action = '/Admin/DeleteContest';
+            var i = document.createElement('input');
+            i.type = 'hidden'; i.name = 'id'; i.value = _cid;
+            f.appendChild(i);
+            document.body.appendChild(f);
+            f.submit();
+        };
+    </script>
 
 </body>
 </html>

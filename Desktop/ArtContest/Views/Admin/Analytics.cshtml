@@ -1,3 +1,7 @@
+@model ArtContest.Controllers.AdminAnalyticsViewModel
+@{
+    var adminLogin = ViewBag.AdminLogin ?? "—";
+}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -26,22 +30,22 @@
             <h1 class="page-title">Аналитика и отчеты</h1>
             <div class="user-badge-inline">
                 <span class="user-role-tag">Администратор:</span>
-                <span class="user-login-label">Administrator</span>
+                <span class="user-login-label">@adminLogin</span>
             </div>
         </header>
 
         <section class="metrics-grid">
             <div class="metric-card">
                 <p class="metric-label">Всего пользователей</p>
-                <p class="metric-value color-dark">248</p>
+                <p class="metric-value color-dark">@Model.TotalUsers</p>
             </div>
             <div class="metric-card">
                 <p class="metric-label">Работ на модерации</p>
-                <p class="metric-value color-orange">45</p>
+                <p class="metric-value color-orange">—</p>
             </div>
             <div class="metric-card">
                 <p class="metric-label">Активных конкурсов</p>
-                <p class="metric-value color-green">3</p>
+                <p class="metric-value color-green">@Model.ActiveContests</p>
             </div>
         </section>
 

@@ -33,6 +33,16 @@ namespace ArtContest.Data
                 entity.Property(e => e.ProfilePhoto).HasColumnName("profile_photo");
                 entity.Property(e => e.IdRole).HasColumnName("id_role");
                 entity.Property(e => e.IdRegion).HasColumnName("id_region");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdRole)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Region)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdRegion)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -129,6 +139,36 @@ namespace ArtContest.Data
                 entity.Property(e => e.IdJudPeriod).HasColumnName("id_jud_period");
                 entity.Property(e => e.IdCriteria1).HasColumnName("id_criteria1");
                 entity.Property(e => e.IdCriteria2).HasColumnName("id_criteria2");
+
+                entity.HasOne(d => d.Category)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdCategory)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Stage)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdStage)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.ApplicationPeriod)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdAppPeriod)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.JudgingPeriod)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdJudPeriod)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Criteria1)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdCriteria1)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Criteria2)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdCriteria2)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

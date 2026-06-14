@@ -1,3 +1,4 @@
+@model List<ArtContest.Models.Contest>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -28,54 +29,73 @@
             </div>
         </header>
 
-        <section class="filters-container">
+        <form class="filters-container" method="get" action="/User/Gallery">
             <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="Поиск конкурсов">
-                <span class="search-icon">
+                <input type="text" name="search" class="search-input" placeholder="Поиск конкурсов" value="@ViewBag.Search">
+                <button type="submit" class="search-icon-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                </span>
+                </button>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Все категории</option>
-                    <option value="photo">Фотография</option>
-                    <option value="drawing">Рисунок</option>
+                <select name="category" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var galCatSel = string.IsNullOrEmpty(ViewBag.SelectedCategory) ? "selected" : null;
+                    }
+                    <option value="" selected="@galCatSel">Все категории</option>
+                    @foreach (var cat in ViewBag.Categories as List<ArtContest.Models.ContestCategory>)
+                    {
+                        var galCatItemSel = ViewBag.SelectedCategory == cat.Id.ToString() ? "selected" : null;
+                        <option value="@cat.Id" selected="@galCatItemSel">@cat.CategoryName</option>
+                    }
                 </select>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>По дате завершения</option>
-                    <option value="new">Сначала новые</option>
-                    <option value="old">Сначала старые</option>
+                <select name="sort" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var galSortNew = ViewBag.Sort == "new" || string.IsNullOrEmpty(ViewBag.Sort) ? "selected" : null;
+                        var galSortOld = ViewBag.Sort == "old" ? "selected" : null;
+                    }
+                    <option value="new" selected="@galSortNew">Сначала новые</option>
+                    <option value="old" selected="@galSortOld">Сначала старые</option>
                 </select>
             </div>
-        </section>
+        </form>
 
         <section class="contests-grid">
-            <article class="contest-card archive-card">
-                <div class="contest-image-holder image-bg-green"></div>
-                <div class="contest-card-content">
-                    <h2 class="contest-title">Зимняя сказка 2025</h2>
-                    <p class="contest-info">Категория: Рисунок</p>
-                    <p class="contest-deadline status-finished">Завершен: 20 января 2026</p>
-                    <a href="/User/Winners" class="btn-action visual-archive-btn">Посмотреть победителей</a>
+            @if (Model.Any())
+            {
+                @foreach (var contest in Model)
+                {
+                    var endDate = contest.ApplicationPeriod != null ? DateTime.Parse(contest.ApplicationPeriod.AppEndDate).ToString("dd MMMM yyyy") : "—";
+                    <article class="contest-card archive-card">
+                        @if (!string.IsNullOrEmpty(contest.ContestImage))
+                        {
+                            <div class="contest-image-holder" style="background-image:url('@Url.Content("~/images/" + contest.ContestImage)');background-size:cover;background-position:center;"></div>
+                        }
+                        else
+                        {
+                            <div class="contest-image-holder image-bg-green"></div>
+                        }
+                        <div class="contest-card-content">
+                            <h2 class="contest-title">@contest.Title</h2>
+                            <p class="contest-info">Категория: @contest.Category?.CategoryName</p>
+                            <p class="contest-deadline status-finished">Завершен: @endDate</p>
+                            <a href="/User/Winners?id=@contest.Id" class="btn-action visual-archive-btn">Посмотреть победителей</a>
+                        </div>
+                    </article>
+                }
+            }
+            else
+            {
+                <div style="width:100%;text-align:center;padding:60px 20px;color:#7c8295;font-size:16px;">
+                    Нет завершённых конкурсов
                 </div>
-            </article>
-
-            <article class="contest-card archive-card">
-                <div class="contest-image-holder image-bg-purple"></div>
-                <div class="contest-card-content">
-                    <h2 class="contest-title">Взгляд сквозь время</h2>
-                    <p class="contest-info">Категория: Фотография</p>
-                    <p class="contest-deadline status-finished">Завершен: 14 февраля 2026</p>
-                    <a href="/User/Winners" class="btn-action visual-archive-btn">Посмотреть победителей</a>
-                </div>
-            </article>
+            }
         </section>
     </main>
 

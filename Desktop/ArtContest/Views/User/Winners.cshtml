@@ -1,3 +1,8 @@
+@model List<ArtContest.Models.Submission>
+@{
+    var contest = ViewBag.Contest as ArtContest.Models.Contest;
+}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -19,44 +24,82 @@
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
             </span>
-            Победители: Весенний вернисаж 2025
+            Победители: @(contest?.Title ?? "Конкурс")
         </a>
     </header>
 
     <main class="winners-page-content">
-        <div class="podium-grid">
+        @if (contest != null && !string.IsNullOrEmpty(contest.ContestImage))
+        {
+            <div class="contest-banner" style="background-image:url('@Url.Content("~/images/" + contest.ContestImage)');background-size:cover;background-position:center;height:200px;border-radius:16px;margin-bottom:30px;"></div>
+        }
 
-            <article class="podium-card place-gold">
-                <div class="podium-image-bg bg-gold"></div>
-                <div class="rank-circle rank-1">1</div>
-                <div class="podium-details">
-                    <h2 class="work-name">Пробуждение</h2>
-                    <p class="author-name">Автор: Алексей С.</p>
-                    <p class="score-label">95 баллов</p>
+        @if (Model.Any())
+        {
+            <div class="podium-grid">
+                @for (int i = 0; i < Model.Count && i < 3; i++)
+                {
+                    var submission = Model[i];
+                    var placeClass = i == 0 ? "place-gold" : (i == 1 ? "place-silver" : "place-bronze");
+                    var rankClass = i == 0 ? "rank-1" : (i == 1 ? "rank-2" : "rank-3");
+                    var bgClass = i == 0 ? "bg-gold" : (i == 1 ? "bg-silver" : "bg-bronze");
+
+                    <article class="podium-card @placeClass">
+                        @if (!string.IsNullOrEmpty(submission.SubmissionImage))
+                        {
+                            <div class="podium-image-bg" style="background-image:url('@Url.Content("~/images/" + submission.SubmissionImage)');background-size:cover;background-position:center;"></div>
+                        }
+                        else
+                        {
+                            <div class="podium-image-bg @bgClass"></div>
+                        }
+                        <div class="rank-circle @rankClass">@(i + 1)</div>
+                        <div class="podium-details">
+                            <h2 class="work-name">@submission.Title</h2>
+                            <p class="author-name">Автор: @submission.User?.Login</p>
+                            <p class="score-label">@(submission.TotalScore?.ToString("F0") ?? "0") баллов</p>
+                        </div>
+                    </article>
+                }
+            </div>
+
+            @if (Model.Count > 3)
+            {
+                <div class="other-winners" style="margin-top:40px;">
+                    <h3 style="font-size:20px;font-weight:700;color:#11142d;margin-bottom:20px;">Другие участники</h3>
+                    <div class="table-container" style="background:#fff;border-radius:16px;border:1px solid #eef0f6;overflow:hidden;">
+                        <table class="log-table" style="width:100%;border-collapse:collapse;text-align:left;font-size:14px;">
+                            <thead>
+                                <tr style="background:#fafbfc;">
+                                    <th style="padding:14px 20px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:#7c8295;font-weight:600;">Место</th>
+                                    <th style="padding:14px 20px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:#7c8295;font-weight:600;">Работа</th>
+                                    <th style="padding:14px 20px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:#7c8295;font-weight:600;">Автор</th>
+                                    <th style="padding:14px 20px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:#7c8295;font-weight:600;">Баллы</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 3; i < Model.Count; i++)
+                                {
+                                    var s = Model[i];
+                                    <tr style="border-bottom:1px solid #eef0f6;">
+                                        <td style="padding:14px 20px;font-weight:700;">@(i + 1)</td>
+                                        <td style="padding:14px 20px;font-weight:700;">@s.Title</td>
+                                        <td style="padding:14px 20px;color:#7c8295;">@s.User?.Login</td>
+                                        <td style="padding:14px 20px;font-weight:700;color:#00ca72;">@(s.TotalScore?.ToString("F0") ?? "0")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </article>
-
-            <article class="podium-card place-silver">
-                <div class="podium-image-bg bg-silver"></div>
-                <div class="rank-circle rank-2">2</div>
-                <div class="podium-details">
-                    <h2 class="work-name">Тихая заводь</h2>
-                    <p class="author-name">Автор: Мария В.</p>
-                    <p class="score-label">88 баллов</p>
-                </div>
-            </article>
-
-            <article class="podium-card place-bronze">
-                <div class="podium-image-bg bg-bronze"></div>
-                <div class="rank-circle rank-3">3</div>
-                <div class="podium-details">
-                    <h2 class="work-name">Городские огни</h2>
-                    <p class="author-name">Автор: Дмитрий П.</p>
-                    <p class="score-label">82 баллов</p>
-                </div>
-            </article>
-
-        </div>
+            }
+        }
+        else
+        {
+            <div style="text-align:center;padding:80px 20px;color:#7c8295;font-size:16px;">
+                У этого конкурса пока нет оценённых работ
+            </div>
+        }
     </main>
 
 </body>

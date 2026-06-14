@@ -1,3 +1,14 @@
+@model List<ArtContest.Models.Contest>
+@{
+    var selectedContestId = ViewBag.ContestId as int?;
+    var existingSubmissionIds = ViewBag.ExistingSubmissionIds as List<int> ?? new List<int>();
+    var firstContest = selectedContestId.HasValue
+        ? Model.FirstOrDefault(c => c.Id == selectedContestId.Value)
+        : (Model.Any() ? Model.First() : null);
+    var contestTitle = firstContest?.Title ?? "Конкурс";
+    var contestRules = firstContest?.Rules ?? "";
+}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -19,41 +30,74 @@
                     <polyline points="12 19 5 12 12 5"></polyline>
                 </svg>
             </span>
-            Конкурс: Осенняя палитра
+            @contestTitle
         </a>
     </header>
 
     <main class="submit-page-content">
+        @if (TempData["Success"] != null)
+        {
+            <div class="success-message">@TempData["Success"]</div>
+        }
+        @if (ViewBag.Error != null)
+        {
+            <div class="form-error-message">@ViewBag.Error</div>
+        }
+
         <section class="info-section">
             <h2 class="info-section-title">Правила и описание</h2>
             <div class="info-text-block">
-                <p>К участию в конкурсе «Осенняя палитра» принимаются авторские работы в категориях «Фотография» и «Цифровой рисунок». Ваша работа должна наиболее полно раскрывать тему красоты природы в осенний период, используя богатство теплых оттенков и уникальное освещение.</p>
+                <p>@contestRules</p>
             </div>
         </section>
 
         <div class="submission-grid">
             <div class="upload-container">
-                <input type="file" id="art-upload" accept="image/png, image/jpeg" hidden>
-                <label for="art-upload" class="upload-dropzone">
-                    <div class="upload-prompt">
+                <input type="file" id="art-upload" name="artFile" accept="image/png, image/jpeg" class="file-input-hidden">
+                <label for="art-upload" class="upload-dropzone" id="dropzone-label">
+                    <div class="upload-prompt" id="uploadPrompt">
                         <p class="main-prompt">Перетащите файл сюда</p>
                         <p class="sub-prompt">JPG, PNG до 10MB</p>
                     </div>
                 </label>
             </div>
 
-            <form class="submission-form">
+            <form class="submission-form" method="post" action="/User/Submit" enctype="multipart/form-data" onsubmit="return validateSubmitForm()">
                 <div class="form-card">
                     <h2 class="form-card-title">Подача заявки</h2>
 
+                    @if (Model.Count > 1)
+                    {
+                        <div class="input-field-group">
+                            <label class="input-label">Конкурс</label>
+                            <select name="contestId" class="text-input" required>
+                                <option value="">Выберите конкурс</option>
+                                @foreach (var c in Model)
+                                {
+                                    var cSel = selectedContestId == c.Id ? "selected" : null;
+                                    var disabledAttr = existingSubmissionIds.Contains(c.Id) ? "disabled" : null;
+                                    <option value="@c.Id" selected="@cSel" disabled="@disabledAttr">@c.Title@(existingSubmissionIds.Contains(c.Id) ? " (заявка подана)" : "")</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    else if (Model.Count == 1)
+                    {
+                        <input type="hidden" name="contestId" value="@Model.First().Id" />
+                    }
+                    else
+                    {
+                        <div class="form-error-message">Нет активных конкурсов для подачи заявки</div>
+                    }
+
                     <div class="input-field-group">
                         <label class="input-label">Название работы</label>
-                        <input type="text" class="text-input" placeholder="Введите название" required>
+                        <input type="text" name="title" class="text-input" placeholder="Введите название" required minlength="3" maxlength="200">
                     </div>
 
                     <div class="input-field-group">
                         <label class="input-label">Описание</label>
-                        <textarea class="text-area-input" placeholder="Расскажите о работе" rows="8" required></textarea>
+                        <textarea name="description" class="text-area-input" placeholder="Расскажите о работе" rows="8" required minlength="10" maxlength="5000"></textarea>
                     </div>
 
                     <button type="submit" class="btn-submit-work">Отправить работу</button>
@@ -61,6 +105,40 @@
             </form>
         </div>
     </main>
+
+    <script>
+        var fileInput = document.getElementById('art-upload');
+        var dropzone = document.getElementById('dropzone-label');
+        if (fileInput && dropzone) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    var file = this.files[0];
+                    var allowed = ['.jpg', '.jpeg', '.png'];
+                    var ext = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+                    if (allowed.indexOf(ext) === -1) { alert('Допустимые форматы: JPG, JPEG, PNG'); this.value = ''; return; }
+                    if (file.size > 10 * 1024 * 1024) { alert('Размер файла не может превышать 10 МБ'); this.value = ''; return; }
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var img = dropzone.querySelector('img');
+                        if (!img) { img = document.createElement('img'); dropzone.appendChild(img); }
+                        img.src = e.target.result;
+                        dropzone.classList.add('has-image');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function validateSubmitForm() {
+            var title = document.querySelector('[name="title"]').value.trim();
+            var desc = document.querySelector('[name="description"]').value.trim();
+            var file = document.getElementById('art-upload');
+            if (!title || title.length < 3) { alert('Название работы должно содержать минимум 3 символа'); return false; }
+            if (!desc || desc.length < 10) { alert('Описание должно содержать минимум 10 символов'); return false; }
+            if (!file || !file.files || file.files.length === 0) { alert('Загрузите изображение работы'); return false; }
+            return true;
+        }
+    </script>
 
 </body>
 </html>

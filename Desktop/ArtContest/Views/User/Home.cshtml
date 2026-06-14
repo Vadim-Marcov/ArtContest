@@ -1,3 +1,4 @@
+@model List<ArtContest.Models.Contest>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -28,54 +29,75 @@
             </div>
         </header>
 
-        <section class="filters-container">
+        <form class="filters-container" method="get" action="/User/Home">
             <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="Поиск конкурсов">
-                <span class="search-icon">
+                <input type="text" name="search" class="search-input" placeholder="Поиск конкурсов" value="@ViewBag.Search">
+                <button type="submit" class="search-icon-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                </span>
+                </button>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>Все категории</option>
-                    <option value="photo">Фотография</option>
-                    <option value="drawing">Рисунок</option>
+                <select name="category" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var homeCatSel = string.IsNullOrEmpty(ViewBag.SelectedCategory) ? "selected" : null;
+                    }
+                    <option value="" selected="@homeCatSel">Все категории</option>
+                    @foreach (var cat in ViewBag.Categories as List<ArtContest.Models.ContestCategory>)
+                    {
+                        var homeCatItemSel = ViewBag.SelectedCategory == cat.Id.ToString() ? "selected" : null;
+                        <option value="@cat.Id" selected="@homeCatItemSel">@cat.CategoryName</option>
+                    }
                 </select>
             </div>
 
             <div class="select-wrapper">
-                <select class="filter-select">
-                    <option value="" disabled selected hidden>По названию</option>
-                    <option value="asc">А-Я</option>
-                    <option value="desc">Я-А</option>
+                <select name="sort" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var homeSortNew = ViewBag.Sort == "new" || string.IsNullOrEmpty(ViewBag.Sort) ? "selected" : null;
+                        var homeSortAsc = ViewBag.Sort == "asc" ? "selected" : null;
+                        var homeSortDesc = ViewBag.Sort == "desc" ? "selected" : null;
+                    }
+                    <option value="new" selected="@homeSortNew">Сначала новые</option>
+                    <option value="asc" selected="@homeSortAsc">А-Я</option>
+                    <option value="desc" selected="@homeSortDesc">Я-А</option>
                 </select>
             </div>
-        </section>
+        </form>
 
         <section class="contests-grid">
-            <article class="contest-card">
-                <div class="contest-image-holder image-bg-blue"></div>
-                <div class="contest-card-content">
-                    <h2 class="contest-title">Осенняя палитра 2026</h2>
-                    <p class="contest-info">Категория: Фотография</p>
-                    <p class="contest-deadline">Прием заявок до 10 апреля</p>
-                    <a href="/User/Submit" class="btn-action">Участвовать</a>
+            @if (Model.Any())
+            {
+                @foreach (var contest in Model)
+                {
+                    var deadline = contest.ApplicationPeriod != null ? DateTime.Parse(contest.ApplicationPeriod.AppEndDate).ToString("dd MMMM") : "—";
+                    <article class="contest-card">
+                        @if (!string.IsNullOrEmpty(contest.ContestImage))
+                        {
+                            <div class="contest-image-holder" style="background-image:url('@Url.Content("~/images/" + contest.ContestImage)');background-size:cover;background-position:center;"></div>
+                        }
+                        else
+                        {
+                            <div class="contest-image-holder image-bg-blue"></div>
+                        }
+                        <div class="contest-card-content">
+                            <h2 class="contest-title">@contest.Title</h2>
+                            <p class="contest-info">Категория: @contest.Category?.CategoryName</p>
+                            <p class="contest-deadline">Прием заявок до @deadline</p>
+                            <a href="/User/Submit?contestId=@contest.Id" class="btn-action">Участвовать</a>
+                        </div>
+                    </article>
+                }
+            }
+            else
+            {
+                <div style="width:100%;text-align:center;padding:60px 20px;color:#7c8295;font-size:16px;">
+                    Нет активных конкурсов
                 </div>
-            </article>
-
-            <article class="contest-card">
-                <div class="contest-image-holder image-bg-pink"></div>
-                <div class="contest-card-content">
-                    <h2 class="contest-title">Цифровой портрет</h2>
-                    <p class="contest-info">Категория: Digital Art</p>
-                    <p class="contest-deadline">Прием заявок до 15 апреля</p>
-                    <a href="/User/Submit" class="btn-action">Участвовать</a>
-                </div>
-            </article>
+            }
         </section>
     </main>
 

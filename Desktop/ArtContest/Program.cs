@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ArtContest.Data;
+using ArtContest.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

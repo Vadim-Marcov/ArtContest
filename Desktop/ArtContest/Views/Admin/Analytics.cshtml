@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtContest - Аналитика и отчеты</title>
+    <link rel="stylesheet" href="~/css/AdminAnalytics.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">ArtContest</div>
+        <nav class="menu">
+            <a href="/Admin/Analytics" class="menu-item active">Аналитика</a>
+            <a href="/Admin/Users" class="menu-item">Пользователи</a>
+            <a href="/Admin/Contests" class="menu-item">Конкурсы</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="content-header">
+            <h1 class="page-title">Аналитика и отчеты</h1>
+            <div class="user-badge-inline">
+                <span class="user-role-tag">Администратор:</span>
+                <span class="user-login-label">Administrator</span>
+            </div>
+        </header>
+
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <p class="metric-label">Всего пользователей</p>
+                <p class="metric-value color-dark">248</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">Работ на модерации</p>
+                <p class="metric-value color-orange">45</p>
+            </div>
+            <div class="metric-card">
+                <p class="metric-label">Активных конкурсов</p>
+                <p class="metric-value color-green">3</p>
+            </div>
+        </section>
+
+        <div class="analytics-bottom-grid">
+
+            <section class="chart-card">
+                <h2 class="card-title">Активность загрузки работ</h2>
+                <div class="chart-container">
+                    <div class="chart-axis-box">
+                        <div class="chart-bar bar-blue" style="height: 35%;"></div>
+                        <div class="chart-bar bar-blue" style="height: 60%;"></div>
+                        <div class="chart-bar bar-dark" style="height: 85%;"></div>
+                        <div class="chart-bar bar-blue" style="height: 48%;"></div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="export-card">
+                <div class="export-meta">
+                    <h2 class="card-title">Сводный отчет</h2>
+                    <p class="export-text">Сбор данных по всем оценкам, участникам и результатам за выбранный период.</p>
+                </div>
+                <button type="button" class="btn-export">Экспорт в MS Office</button>
+            </aside>
+
+        </div>
+    </main>
+
+</body>
+</html>

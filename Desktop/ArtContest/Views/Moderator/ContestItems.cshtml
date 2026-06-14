@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtContest - Заявки конкурса</title>
+    <link rel="stylesheet" href="~/css/ModContestItems.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="top-bar">
+        <a href="/Moderator/Home" class="back-link">
+            <span class="back-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </span>
+            Конкурс: Осенняя палитра
+        </a>
+    </header>
+
+    <main class="page-content">
+
+        <section class="info-section">
+            <h2 class="info-section-title">Правила и описание</h2>
+            <div class="info-text-block">
+                <p>К участию в конкурсе «Осенняя палитра» принимаются авторские работы в категориях «Фотография» и «Цифровой рисунок». Ваша работа должна наиболее полно раскрывать тему красоты природы в осенний период, используя богатство теплых оттенков и уникальное освещение.</p>
+            </div>
+        </section>
+
+        <section class="table-section">
+            <h2 class="info-section-title">Список заявок</h2>
+
+            <div class="table-container">
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Название работы</th>
+                            <th>Автор</th>
+                            <th>Дата подачи</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="work-name-td">Золотой рассвет</span></td>
+                            <td>Алексей П.</td>
+                            <td>10.10.2026</td>
+                            <td><a href="/Moderator/Review" class="btn-table-action">Проверить</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="work-name-td">Туманный октябрь</span></td>
+                            <td>Мария И.</td>
+                            <td>09.10.2026</td>
+                            <td><a href="/Moderator/Review" class="btn-table-action">Проверить</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="work-name-td">Рябиновый всплеск</span></td>
+                            <td>Игорь К.</td>
+                            <td>08.10.2026</td>
+                            <td><a href="/Moderator/Review" class="btn-table-action">Проверить</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>

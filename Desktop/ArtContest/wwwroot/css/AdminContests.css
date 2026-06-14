@@ -1,0 +1,268 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f6f7fb;
+    color: #11142d;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ================= БОКОВОЕ МЕНЮ ================= */
+.sidebar {
+    width: 260px;
+    background-color: #0f2c59;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 0;
+    flex-shrink: 0;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    padding-left: 35px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 45px;
+    letter-spacing: 0.5px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.menu-item {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.menu-item.active {
+    background-color: #ffffff;
+    color: #0f2c59;
+    font-weight: 600;
+}
+
+/* ================= ОСНОВНОЙ КОНТЕНТ ================= */
+.main-content {
+    flex-grow: 1;
+    padding: 40px 55px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.main-content::-webkit-scrollbar {
+    display: none;
+}
+.main-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 42px;
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #11142d;
+    line-height: 42px;
+}
+
+/* Кнопка "+ Создать конкурс" в шапке */
+.btn-create-contest {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0f2c59;
+    color: #ffffff;
+    text-decoration: none;
+    width: 180px; /* Фиксированная ширина как у нижней кнопки */
+    height: 42px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.btn-create-contest:hover {
+    background-color: #0a1f3f;
+}
+
+/* ================= КАРТОЧКА КОНКУРСА ================= */
+.contests-list-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.contest-management-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef0f6;
+    padding: 30px 35px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+    width: 100%;
+}
+
+.card-body-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; /* Опускает правый блок на уровень дат таймлайна */
+    width: 100%;
+    gap: 40px;
+}
+
+.contest-timeline-block {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.contest-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #11142d;
+}
+
+/* ================= ТАЙМЛАЙН ВРЕМЕННЫХ ЭТАПОВ ================= */
+.timeline-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.timeline-header-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #7c8295;
+    letter-spacing: 0.5px;
+}
+
+.timeline-track-container {
+    position: relative;
+    width: 100%;
+    padding-top: 6px;
+}
+
+.timeline-track-container::before {
+    content: '';
+    position: absolute;
+    top: 11px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-image: linear-gradient(to right, #0f2c59 33%, #cbd5e1 33%);
+    z-index: 1;
+}
+
+.timeline-nodes {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.timeline-node {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+}
+
+.timeline-nodes .timeline-node:nth-child(2) { align-items: center; }
+.timeline-nodes .timeline-node:last-child { align-items: flex-end; }
+
+.node-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #cbd5e1;
+    margin-bottom: 12px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px #cbd5e1;
+    transition: all 0.2s ease;
+}
+
+.timeline-node.done .node-dot {
+    background-color: #0f2c59;
+    box-shadow: 0 0 0 1px #0f2c59;
+}
+
+.node-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #11142d;
+    margin-bottom: 4px;
+    white-space: nowrap;
+}
+
+.node-date {
+    font-size: 13px;
+    color: #9a9fae;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.timeline-node.done .node-title {
+    color: #11142d;
+}
+
+/* ================= ДЕЙСТВИЕ (КНОПКА РЕДАКТИРОВАТЬ) ================= */
+.card-action-block {
+    width: 180px; /* Задаем фиксированную ширину блока */
+    flex-shrink: 0;
+}
+
+.btn-card-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0f2c59;
+    color: #ffffff;
+    text-decoration: none;
+    width: 100%; /* Растягивается на всю ширину родительского блока (180px) */
+    padding: 14px 0; /* Убираем боковые паддинги, выравнивание по центру */
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-card-edit:hover {
+    background-color: #0a1f3f;
+}

@@ -1,0 +1,161 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f6f7fb;
+    color: #11142d;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ================= ВЕРХНЯЯ ПАНЕЛЬ ================= */
+.top-bar {
+    background-color: #0f2c59;
+    padding: 0 55px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.back-arrow {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================= КОНТЕНТНАЯ ОБЛАСТЬ ================= */
+.page-content {
+    flex-grow: 1;
+    padding: 45px 55px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-content::-webkit-scrollbar {
+    display: none;
+}
+.page-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Блок описания и правил */
+.info-section {
+    margin-bottom: 45px;
+}
+
+.info-section-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #11142d;
+}
+
+.info-text-block {
+    color: #555e75;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Табличная часть */
+.table-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.table-container {
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef0f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+    overflow: hidden;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.items-table th {
+    background-color: #fafbfc;
+    color: #7c8295;
+    font-weight: 600;
+    padding: 18px 24px;
+    border-bottom: 1px solid #eef0f6;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Задаем фиксированную аккуратную ширину для столбца с кнопкой */
+.items-table th:last-child,
+.items-table td:last-child {
+    width: 180px;
+    padding: 12px 24px; /* Чуть уменьшили вертикальный паддинг для баланса с кнопкой */
+}
+
+.items-table td {
+    padding: 18px 24px;
+    color: #11142d;
+    border-bottom: 1px solid #eef0f6;
+    vertical-align: middle;
+}
+
+.items-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.items-table tbody tr:hover {
+    background-color: #f9faff;
+}
+
+.items-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.work-name-td {
+    font-weight: 700;
+    color: #11142d;
+}
+
+/* Исправлено: Кнопка теперь блочная, растянута на 100% ячейки и текст по центру */
+.btn-table-action {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: #0f2c59;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.btn-table-action:hover {
+    background-color: #0a1f3f;
+}

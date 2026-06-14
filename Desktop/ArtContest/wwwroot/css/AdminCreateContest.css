@@ -1,0 +1,273 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f6f7fb;
+    color: #11142d;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ================= ВЕРХНЯЯ ПАНЕЛЬ ================= */
+.top-bar {
+    background-color: #0f2c59;
+    padding: 0 55px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.back-arrow {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================= КОНТЕНТНАЯ ОБЛАСТЬ ================= */
+.create-contest-content {
+    flex-grow: 1;
+    padding: 40px 55px; /* Боковые отступы 55px создают идеальные поля */
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.create-contest-content::-webkit-scrollbar {
+    display: none;
+}
+.create-contest-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Белая карточка формы — теперь растягивается на всю доступную ширину */
+.form-wrapper-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 40px 45px;
+    border: 1px solid #eef0f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+    width: 100%; /* Занимает 100% ширины контентной области */
+    max-width: 1400px; /* Предотвращает чрезмерный разнос на ультрашироких мониторах */
+}
+
+.create-contest-form {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* Сетка верхней части: Две колонки делят пространство поровну */
+.form-grid-layout {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px; /* Фиксированный отступ между колонками */
+    width: 100%;
+}
+
+/* Обе колонки занимают одинаковую ширину (50% на 50%) */
+.form-fields-column {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-image-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Элементы ввода */
+.input-field-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width-group {
+    width: 100%;
+}
+
+.input-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #11142d;
+    margin-bottom: 12px;
+}
+
+.text-input, .text-area-input, .custom-select {
+    width: 100%;
+    padding: 15px 18px;
+    background-color: #f6f7fb;
+    border: 1px solid #e2e5ed;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #11142d;
+    outline: none;
+}
+
+.text-input::placeholder, .text-area-input::placeholder {
+    color: #9a9fae;
+}
+
+.text-input:focus, .text-area-input:focus, .custom-select:focus {
+    border-color: #0f2c59;
+    background-color: #ffffff;
+}
+
+.text-area-input {
+    resize: none;
+    overflow-y: auto;
+}
+
+/* Выпадающие списки */
+.select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 45px;
+    cursor: pointer;
+}
+
+.select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #11142d;
+    pointer-events: none;
+}
+
+/* ================= ЗОНА ЗАГРУЗКИ ИЗОБРАЖЕНИЯ ================= */
+.upload-container {
+    width: 100%;
+    flex-grow: 1; /* Автоматически растягивается на высоту левой колонки */
+    min-height: 310px; 
+}
+
+.upload-dropzone {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border: 2px dashed #11142d;
+    border-radius: 12px;
+    background-color: #eef0f6;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.upload-dropzone:hover {
+    background-color: #e2e5ed;
+}
+
+.main-prompt {
+    font-size: 16px;
+    font-weight: 700;
+    color: #11142d;
+    margin-bottom: 6px;
+}
+
+.sub-prompt {
+    font-size: 13px;
+    color: #7c8295;
+}
+
+/* ================= БЛОК ДАТ (ВНИЗУ) ================= */
+.date-ranges-row {
+    display: flex;
+    gap: 50px; /* Отступ в точности совпадает с верхней сеткой */
+    width: 100%;
+}
+
+/* Блоки дат теперь тоже идеально выравниваются под верхними колонками */
+.date-range-item {
+    flex: 1;
+}
+
+.date-inputs-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.date-input-field {
+    width: 45%; /* Симметричные поля ввода */
+    background-color: #f6f7fb;
+    border: 1px solid #e2e5ed;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #11142d;
+    outline: none;
+    text-align: center;
+}
+
+.date-input-field:focus {
+    border-color: #0f2c59;
+    background-color: #ffffff;
+}
+
+.date-separator {
+    color: #11142d;
+    font-size: 16px;
+    font-weight: 500;
+    user-select: none;
+}
+
+/* ================= КНОПКА ОТПРАВКИ ================= */
+.btn-submit-contest {
+    width: 100%;
+    background-color: #0f2c59;
+    color: #ffffff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-submit-contest:hover {
+    background-color: #0a1f3f;
+}

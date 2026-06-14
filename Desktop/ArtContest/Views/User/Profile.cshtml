@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtContest - Профиль</title>
+    <link rel="stylesheet" href="~/css/UserProfile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">ArtContest</div>
+        <nav class="menu">
+            <a href="/User/Home" class="menu-item">Главная</a>
+            <a href="/User/Profile" class="menu-item active">Профиль</a>
+            <a href="/User/Gallery" class="menu-item">Галерея</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <h1 class="page-title">Личный кабинет</h1>
+            <a href="/Auth/Login" class="logout-trigger">
+                <span class="logout-text">Выйти</span>
+                <span class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </span>
+            </a>
+        </header>
+
+        <form class="profile-card-form">
+            <div class="profile-meta-container">
+                <div class="avatar-container">
+                    <div class="profile-avatar-big"></div>
+                    <button type="button" class="btn-change-photo">Изменить фото</button>
+                </div>
+
+                <div class="profile-form-grid">
+                    <div class="form-field">
+                        <label class="field-label">Логин</label>
+                        <input type="text" class="field-input" value="Алексей Смирнов" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="field-label">E-mail</label>
+                        <input type="email" class="field-input" value="Example1@gmail.com" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="field-label">Дата рождения</label>
+                        <input type="date" class="field-input" value="2008-02-15" required>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="field-label">Регион</label>
+                        <div class="select-field-wrapper">
+                            <select class="field-select">
+                                <option value="minsk">Минская обл.</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save-full-width">Сохранить изменения</button>
+        </form>
+
+        <section class="history-container">
+            <h2 class="section-title">История заявок</h2>
+
+            <div class="table-container">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Название работы</th>
+                            <th>Дата подачи</th>
+                            <th>Конкурс</th>
+                            <th>Статус</th>
+                            <th>Комментарий модератора</th>
+                            <th>Комментарии жюри</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="work-name-td">Утренний лес</span></td>
+                            <td class="date-td">10.06.2026</td>
+                            <td>Осенняя палитра</td>
+                            <td><span class="status-badge status-pending">Модерация</span></td>
+                            <td class="comment-td">—</td>
+                            <td class="comment-td">—</td>
+                        </tr>
+                        <tr>
+                            <td><span class="work-name-td">Неоновый город</span></td>
+                            <td class="date-td">24.05.2026</td>
+                            <td>Киберпанк 2077</td>
+                            <td><span class="status-badge status-approved">Одобрено</span></td>
+                            <td class="comment-td">Соответствует категории. Принято на этап оценки.</td>
+                            <td class="comment-td">
+                                <div class="jury-comments-list">
+                                    <div class="jury-item"><strong>Жюри #1:</strong> Потрясающая работа со светом и неоновыми бликами.</div>
+                                    <div class="jury-item"><strong>Жюри #2:</strong> Отличная композиция, полностью передает дух жанра.</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="work-name-td">Осенняя сказка</span></td>
+                            <td class="date-td">12.05.2026</td>
+                            <td>Осенняя палитра</td>
+                            <td><span class="status-badge status-rejected">Отклонено</span></td>
+                            <td class="comment-td">Работа не соответствует теме конкурса (изображён летний пляж).</td>
+                            <td class="comment-td">—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>

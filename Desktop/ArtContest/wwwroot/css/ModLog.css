@@ -1,0 +1,125 @@
+@import url('ModHome.css');
+
+/* ================= ЭЛЕМЕНТ ВЫХОДА ИЗ АККАУНТА ================= */
+.logout-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 42px;
+    text-decoration: none;
+    color: #ff4d4d;
+    font-weight: 600;
+    font-size: 15px;
+    transition: opacity 0.2s ease;
+}
+
+.logout-trigger:hover {
+    opacity: 0.8;
+}
+
+.logout-text {
+    /* Стили для текста "Выйти" */
+    font-family: 'Inter', sans-serif;
+}
+
+.logout-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================= ТАБЛИЦА ИСТОРИИ ПРОВЕРОК ================= */
+.table-container {
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef0f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+    overflow: hidden;
+}
+
+/* Стили для даты проверки в таблице */
+.date-td {
+    color: #7c8295;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* На случай, если в ModLog.css еще нет класса для статуса доработки */
+.status-fix {
+    background-color: #fff0e6;
+    color: #f59e0b;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.log-table th {
+    background-color: #fafbfc;
+    color: #7c8295;
+    font-weight: 600;
+    padding: 18px 24px;
+    border-bottom: 1px solid #eef0f6;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.log-table td {
+    padding: 18px 24px;
+    color: #11142d;
+    border-bottom: 1px solid #eef0f6;
+    vertical-align: middle;
+}
+
+.log-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.log-table tbody tr:hover {
+    background-color: #f9faff;
+}
+
+.log-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.work-name-td {
+    font-weight: 700;
+    color: #11142d;
+}
+
+/* Статусные бейджи в таблице */
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+}
+
+.status-approved {
+    background-color: #e1fcef;
+    color: #00ca72;
+}
+
+.status-rejected {
+    background-color: #ffe5e5;
+    color: #ff4d4d;
+}
+
+.comment-td {
+    color: #555e75;
+    max-width: 300px;
+    line-height: 1.4;
+    white-space: normal;
+    word-break: break-word;
+}

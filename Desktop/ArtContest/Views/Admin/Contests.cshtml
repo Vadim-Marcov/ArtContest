@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtContest - Управление конкурсами</title>
+    <link rel="stylesheet" href="~/css/AdminContests.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">ArtContest</div>
+        <nav class="menu">
+            <a href="/Admin/Analytics" class="menu-item">Аналитика</a>
+            <a href="/Admin/Users" class="menu-item">Пользователи</a>
+            <a href="/Admin/Contests" class="menu-item active">Конкурсы</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="content-header">
+            <h1 class="page-title">Управление конкурсами</h1>
+            <a href="/Admin/CreateContest" class="btn-create-contest">+ Создать конкурс</a>
+        </header>
+
+        <section class="contests-list-container">
+
+            <article class="contest-management-card">
+                <div class="card-body-layout">
+
+                    <div class="contest-timeline-block">
+                        <h2 class="contest-card-title">Осенняя палитра 2026</h2>
+
+                        <div class="timeline-wrapper">
+                            <p class="timeline-header-label">ВРЕМЕННЫЕ ЭТАПЫ:</p>
+
+                            <div class="timeline-track-container">
+                                <div class="timeline-line-progress"></div>
+
+                                <div class="timeline-nodes">
+                                    <div class="timeline-node done">
+                                        <div class="node-dot"></div>
+                                        <span class="node-title">Прием заявок</span>
+                                        <span class="node-date">01.03 - 15.04</span>
+                                    </div>
+
+                                    <div class="timeline-node">
+                                        <div class="node-dot"></div>
+                                        <span class="node-title">Этап судейства</span>
+                                        <span class="node-date">16.04 - 25.04</span>
+                                    </div>
+
+                                    <div class="timeline-node">
+                                        <div class="node-dot"></div>
+                                        <span class="node-title">Итоги</span>
+                                        <span class="node-date">26.04.2026</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card-action-block">
+                        <a href="/Admin/EditContest" class="btn-card-edit">Редактировать</a>
+                    </div>
+
+                </div>
+            </article>
+
+        </section>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+@import url('Auth.css');
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    color: #9a9fae; /* Цвет плейсхолдера по умолчанию */
+}
+
+/* Если выбран реальный элемент, цвет меняется */
+.select-wrapper select:valid {
+    color: #11142d;
+}
+
+/* Стрелочка вниз для выпадающего списка */
+.select-wrapper::after {
+    content: '▼';
+    font-size: 12px;
+    color: #11142d;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Корректировка высоты карточки, так как полей больше, но скролл экрана по-прежнему залочен */
+.auth-card {
+    max-width: 480px;
+    padding: 40px 45px;
+}
+
+.auth-title {
+    margin-bottom: 25px;
+}
+
+.auth-form {
+    gap: 12px;
+}

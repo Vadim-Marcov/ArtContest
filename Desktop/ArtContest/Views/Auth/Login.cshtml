@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtContest - Вход</title>
+    <link rel="stylesheet" href="~/css/Auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="auth-card">
+        <h1 class="auth-title">Вход в ArtContest</h1>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-message">@ViewBag.Error</div>
+        }
+
+        <form class="auth-form" method="post" action="/Auth/Login">
+            <div class="input-group">
+                <input type="text" name="login" placeholder="Логин" required>
+            </div>
+
+            <div class="input-group password-group">
+                <input type="password" name="password" placeholder="Пароль" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Войти</button>
+        </form>
+
+        <div class="auth-footer">
+            <a href="/Auth/Register" class="auth-link">Нет аккаунта? Регистрация</a>
+        </div>
+    </div>
+
+</body>
+</html>

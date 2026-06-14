@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtContest - База пользователей</title>
+    <link rel="stylesheet" href="~/css/AdminUsers.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">ArtContest</div>
+        <nav class="menu">
+            <a href="/Admin/Analytics" class="menu-item">Аналитика</a>
+            <a href="/Admin/Users" class="menu-item active">Пользователи</a>
+            <a href="/Admin/Contests" class="menu-item">Конкурсы</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="content-header">
+            <h1 class="page-title">База пользователей</h1>
+            <a href="/Auth/Login" class="logout-trigger">
+                <span class="logout-text">Выйти</span>
+                <span class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </span>
+            </a>
+        </header>
+
+        <section class="filters-container">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Поиск по логину или почте">
+                <span class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="select-wrapper">
+                <select class="filter-select">
+                    <option value="" disabled selected hidden>Роль: Все</option>
+                    <option value="admin">Администратор</option>
+                    <option value="participant">Участник</option>
+                    <option value="jury">Член жюри</option>
+                    <option value="moderator">Модератор</option>
+                </select>
+            </div>
+
+            <div class="select-wrapper">
+                <select class="filter-select">
+                    <option value="" disabled selected hidden>Сначала новые</option>
+                    <option value="old">Сначала старые</option>
+                    <option value="alphabet">По алфавиту</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="table-container">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Пользователь</th>
+                        <th>Роль (Управление)</th>
+                        <th class="text-right">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="user-info-cell">
+                                <span class="user-name-title">Алексей Смирнов</span>
+                                <span class="user-email-subtitle">example1@gmail.com</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="table-select-wrapper size-participant">
+                                <select class="role-table-select text-participant">
+                                    <option value="participant" selected>Участник</option>
+                                    <option value="jury">Член жюри</option>
+                                    <option value="moderator">Модератор</option>
+                                    <option value="admin">Администратор</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="text-right">
+                            <button type="button" class="btn-table-delete">Удалить</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info-cell">
+                                <span class="user-name-title">Иван Иванов</span>
+                                <span class="user-email-subtitle">example2@gmail.com</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="table-select-wrapper size-jury">
+                                <select class="role-table-select text-jury">
+                                    <option value="participant">Участник</option>
+                                    <option value="jury" selected>Член жюри</option>
+                                    <option value="moderator">Модератор</option>
+                                    <option value="admin">Администратор</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="text-right">
+                            <button type="button" class="btn-table-delete">Удалить</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info-cell">
+                                <span class="user-name-title">Анна Модана</span>
+                                <span class="user-email-subtitle">example3@gmail.com</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="table-select-wrapper size-moderator">
+                                <select class="role-table-select text-moderator">
+                                    <option value="participant">Участник</option>
+                                    <option value="jury">Член жюри</option>
+                                    <option value="moderator" selected>Модератор</option>
+                                    <option value="admin">Администратор</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="text-right">
+                            <button type="button" class="btn-table-delete">Удалить</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+</body>
+</html>

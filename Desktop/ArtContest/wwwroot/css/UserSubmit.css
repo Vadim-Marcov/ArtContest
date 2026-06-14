@@ -1,0 +1,195 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f6f7fb;
+    color: #11142d;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ================= ВЕРХНЯЯ ПАНЕЛЬ ================= */
+.top-bar {
+    background-color: #0f2c59;
+    padding: 0 55px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 24px;       /* Установили строго 24px, как ты решил */
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.back-arrow {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================= КОНТЕНТНАЯ ОБЛАСТЬ ================= */
+.submit-page-content {
+    flex-grow: 1;
+    padding: 45px 55px;
+    overflow-y: auto;
+}
+
+.submit-page-content::-webkit-scrollbar {
+    display: none;
+}
+.submit-page-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Блок правил */
+.info-section {
+    margin-bottom: 35px;
+}
+
+.info-section-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px; /* Вернули эталонные 25px */
+}
+
+.info-text-block {
+    color: #555e75;
+    font-size: 15px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Сетка загрузки и формы */
+.submission-grid {
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+}
+
+/* Зона загрузки файла */
+.upload-container {
+    flex: 1;
+    min-height: 400px;
+}
+
+.upload-dropzone {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border: 2px dashed #11142d;
+    border-radius: 16px;
+    background-color: #f0f2f8;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.upload-dropzone:hover {
+    background-color: #e8ecf8;
+}
+
+.main-prompt {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sub-prompt {
+    font-size: 13px;
+    color: #7c8295;
+}
+
+/* Форма справа */
+.submission-form {
+    width: 500px;
+    flex-shrink: 0;
+}
+
+.form-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid #eef0f6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+}
+
+.form-card-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+.input-field-group {
+    margin-bottom: 20px;
+}
+
+.input-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #11142d;
+    margin-bottom: 10px;
+}
+
+.text-input, .text-area-input {
+    width: 100%;
+    padding: 14px 16px;
+    background-color: #f6f7fb;
+    border: 1px solid #e2e5ed;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #11142d;
+    outline: none;
+}
+
+/* Отдельное правило для текстовой области */
+.text-area-input {
+    resize: none;             /* Запретили ручное изменение размера */
+    overflow-y: auto;         /* Полоса прокрутки появится автоматически, когда текст заполнит поле */
+}
+
+.text-input:focus, .text-area-input:focus {
+    border-color: #0f2c59;
+    background-color: #ffffff;
+}
+
+/* Кнопка */
+.btn-submit-work {
+    width: 100%;
+    background-color: #0f2c59;
+    color: #ffffff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-submit-work:hover {
+    background-color: #0a1f3f;
+}

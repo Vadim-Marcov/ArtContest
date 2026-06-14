@@ -1,0 +1,23 @@
+@import url('UserHome.css');
+
+.image-bg-green { background-color: #e1f4f4; }
+.image-bg-purple { background-color: #eae5f7; }
+
+.contest-deadline.status-finished {
+    color: #7c8295;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+.btn-action.visual-archive-btn {
+    background-color: #0f2c59;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-action.visual-archive-btn:hover {
+    background-color: #0a1f3f;
+}

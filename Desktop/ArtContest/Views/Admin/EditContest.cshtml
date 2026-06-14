@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtContest - Редактирование конкурса</title>
+    <link rel="stylesheet" href="~/css/AdminEditContest.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="top-bar">
+        <a href="/Admin/Contests" class="back-link">
+            <span class="back-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </span>
+            Редактирование
+        </a>
+    </header>
+
+    <main class="create-contest-content">
+        <div class="form-wrapper-card">
+            <form class="create-contest-form">
+
+                <div class="form-grid-layout">
+
+                    <div class="form-fields-column">
+                        <div class="input-field-group">
+                            <label class="input-label">Название конкурса</label>
+                            <input type="text" class="text-input" value="Осенняя палитра 2026" required>
+                        </div>
+
+                        <div class="input-field-group">
+                            <label class="input-label">Категория</label>
+                            <div class="select-wrapper">
+                                <select class="custom-select" required>
+                                    <option value="photo" selected>Фотография</option>
+                                    <option value="digital">Цифровой рисунок</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-field-group">
+                            <label class="input-label">Критерий оценки 1</label>
+                            <div class="select-wrapper">
+                                <select class="custom-select" required>
+                                    <option value="technique" selected>Техника исполнения</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-field-group">
+                            <label class="input-label">Критерий оценки 2</label>
+                            <div class="select-wrapper">
+                                <select class="custom-select" required>
+                                    <option value="originality" selected>Оригинальность</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-image-column">
+                        <label class="input-label">Изображение конкурса</label>
+                        <div class="upload-container">
+                            <input type="file" id="contest-image-upload" accept="image/png, image/jpeg" hidden>
+                            <label for="contest-image-upload" class="upload-dropzone filled-dropzone">
+                                <div class="upload-prompt">
+                                    <p class="image-placeholder-text">[Изображение работы]</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="input-field-group full-width-group">
+                    <label class="input-label">Правила и описание</label>
+                    <textarea class="text-area-input" rows="3" required>Принимаются работы в осенней тематике...</textarea>
+                </div>
+
+                <div class="date-ranges-row">
+                    <div class="date-range-item">
+                        <label class="input-label">Прием заявок (С - По)</label>
+                        <div class="date-inputs-wrapper">
+                            <input type="text" class="date-input-field disabled-date" value="01.03.2026" disabled>
+                            <span class="date-separator">—</span>
+                            <input type="text" class="date-input-field" value="15.04.2026" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                        </div>
+                    </div>
+
+                    <div class="date-range-item">
+                        <label class="input-label">Этап судейства (С - По)</label>
+                        <div class="date-inputs-wrapper">
+                            <input type="text" class="date-input-field" value="16.04.2026" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                            <span class="date-separator">—</span>
+                            <input type="text" class="date-input-field" value="25.04.2026" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-actions-row">
+                    <button type="submit" class="btn-save-changes">Сохранить изменения</button>
+                    <button type="button" class="btn-delete-contest">Удалить конкурс</button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>

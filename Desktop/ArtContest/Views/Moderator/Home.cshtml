@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtContest - Модерация</title>
+    <link rel="stylesheet" href="~/css/ModHome.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">ArtContest</div>
+        <nav class="menu">
+            <a href="/Moderator/Home" class="menu-item active">Главная</a>
+            <a href="/Moderator/Log" class="menu-item">Журнал</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <h1 class="page-title">Конкурсы на проверку</h1>
+            <div class="user-badge-inline">
+                <span class="user-role-tag">Модератор:</span>
+                <span class="user-login-label">mod_vadim</span>
+            </div>
+        </header>
+
+        <section class="filters-container">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Поиск конкурсов">
+                <span class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="select-wrapper">
+                <select class="filter-select">
+                    <option value="" disabled selected hidden>Категория</option>
+                    <option value="photo">Фотография</option>
+                    <option value="digital">Цифровой рисунок</option>
+                </select>
+            </div>
+
+            <div class="select-wrapper">
+                <select class="filter-select">
+                    <option value="" disabled selected hidden>Статус</option>
+                    <option value="active">Активные</option>
+                    <option value="pending">Ожидают</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="contests-grid">
+
+            <article class="contest-card">
+                <div class="contest-image-holder image-bg-blue"></div>
+                <div class="contest-card-content">
+                    <h2 class="contest-title">Осенняя палитра</h2>
+                    <p class="contest-info">Категория: Фотография</p>
+                    <p class="contest-counter-alert">Новых заявок: 12</p>
+                    <a href="/Moderator/ContestItems" class="btn-action">Смотреть заявки</a>
+                </div>
+            </article>
+
+            <article class="contest-card">
+                <div class="contest-image-holder image-bg-pink"></div>
+                <div class="contest-card-content">
+                    <h2 class="contest-title">Цифровой портрет</h2>
+                    <p class="contest-info">Категория: Цифровой рисунок</p>
+                    <p class="contest-counter-alert">Новых заявок: 5</p>
+                    <a href="/Moderator/ContestItems" class="btn-action">Смотреть заявки</a>
+                </div>
+            </article>
+
+        </section>
+    </main>
+
+</body>
+</html>

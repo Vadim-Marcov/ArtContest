@@ -1,0 +1,297 @@
+@import url('UserHome.css');
+
+/* ================= ЭЛЕМЕНТ ВЫХОДА ИЗ АККАУНТА ================= */
+.logout-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 42px;
+    text-decoration: none;
+    color: #ff4d4d;
+    font-weight: 600;
+    font-size: 15px;
+    transition: opacity 0.2s ease;
+}
+
+.logout-trigger:hover {
+    opacity: 0.8;
+}
+
+.logout-text {
+    font-family: 'Inter', sans-serif;
+}
+
+.logout-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================= СТРУКТУРНАЯ ФОРМА ПРОФИЛЯ ================= */
+.profile-card-form {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid #eef0f6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+    margin-bottom: 45px;
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+}
+
+/* Двухколоночная сетка для группировки аватара и полей */
+.profile-meta-container {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 50px;
+    align-items: start; /* Выравнивание блоков по верхней линии */
+    width: 100%;
+}
+
+/* Контейнер аватарки: возвращаем плотную связь между кругом и кнопкой */
+.avatar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px; /* Аккуратный фиксированный отступ, чтобы круг не отрывался */
+    width: 180px;
+    flex-shrink: 0;
+    margin-top: 10px; /* Ювелирный сдвиг вниз, компенсирующий высоту верхних лейблов */
+}
+
+.profile-avatar-big {
+    width: 160px;
+    height: 160px;
+    background-color: #e2e5ed;
+    border-radius: 50%;
+}
+
+.btn-change-photo {
+    background: none;
+    border: none;
+    color: #2f66ff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    line-height: 1; /* Убираем системные полуторные отступы строки */
+    padding: 0;
+    transition: opacity 0.2s ease;
+}
+
+.btn-change-photo:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Двухколоночная сетка для полей ввода */
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 24px; /* Стандартные аккуратные отступы между инпутами */
+}
+
+.form-field {
+    width: 100%;
+}
+
+.field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #11142d;
+    margin-bottom: 10px;
+}
+
+.field-input, .field-select {
+    width: 100%;
+    padding: 14px 16px;
+    background-color: #f6f7fb;
+    border: 1px solid #e2e5ed;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #11142d;
+    outline: none;
+    height: 49px;
+    box-sizing: border-box; /* Защита от деформации высоты при фокусе */
+    transition: all 0.2s ease;
+}
+
+.field-input:focus, .field-select:focus {
+    border-color: #0f2c59;
+    background-color: #ffffff;
+}
+
+.select-field-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.field-select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding-right: 40px;
+}
+
+.select-field-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #11142d;
+    pointer-events: none;
+}
+
+.btn-save-full-width {
+    width: 100%;
+    background-color: #0f2c59;
+    color: #ffffff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-save-full-width:hover {
+    background-color: #0a1f3f;
+}
+
+/* ================= СЕКЦИЯ ИСТОРИИ ЗАЯВОК (ТАБЛИЦА) ================= */
+.history-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 45px;
+}
+
+.date-td {
+    color: #7c8295;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.section-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #11142d;
+    margin-bottom: 25px;
+}
+
+.table-container {
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef0f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+    overflow: hidden;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.log-table th {
+    background-color: #fafbfc;
+    color: #7c8295;
+    font-weight: 600;
+    padding: 18px 24px;
+    border-bottom: 1px solid #eef0f6;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.log-table td {
+    padding: 18px 24px;
+    color: #11142d;
+    border-bottom: 1px solid #eef0f6;
+    vertical-align: top;
+}
+
+.log-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.log-table tbody tr:hover {
+    background-color: #f9faff;
+}
+
+.log-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.work-name-td {
+    font-weight: 700;
+    color: #11142d;
+}
+
+/* Статусные бейджи в таблице */
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+}
+
+.status-pending {
+    background-color: #fff4d9;
+    color: #ffb000;
+}
+
+.status-approved {
+    background-color: #e1fcef;
+    color: #00ca72;
+}
+
+.status-fix {
+    background-color: #fff0e6;
+    color: #f59e0b;
+}
+
+.status-rejected {
+    background-color: #ffe5e5;
+    color: #ff4d4d;
+}
+
+.comment-td {
+    color: #555e75;
+    max-width: 300px;
+    line-height: 1.5;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.jury-comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.jury-item {
+    font-size: 13px;
+    color: #555e75;
+    background-color: #f6f7fb;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #eef0f6;
+}

@@ -14,6 +14,7 @@ body {
     overflow: hidden;
 }
 
+/* ================= ВЕРХНЯЯ ПАНЕЛЬ ================= */
 .top-bar {
     background-color: #0f2c59;
     padding: 0 55px;
@@ -41,6 +42,7 @@ body {
     justify-content: center;
 }
 
+/* ================= КОНТЕНТНАЯ ОБЛАСТЬ ================= */
 .create-contest-content {
     flex-grow: 1;
     padding: 40px 55px;
@@ -58,6 +60,7 @@ body {
     scrollbar-width: none;
 }
 
+/* Белая карточка формы (Растянута на всю доступную ширину) */
 .form-wrapper-card {
     background-color: #ffffff;
     border-radius: 20px;
@@ -74,14 +77,16 @@ body {
     gap: 28px;
 }
 
+/* Сетка верхней части: колонки строго одной высоты */
 .form-grid-layout {
     display: flex;
     justify-content: space-between;
-    align-items: stretch;
+    align-items: stretch; /* Заставляет правую колонку тянуться за левой */
     gap: 50px;
     width: 100%;
 }
 
+/* Обе колонки делят экран 50/50 */
 .form-fields-column {
     flex: 1;
     display: flex;
@@ -95,6 +100,7 @@ body {
     flex-direction: column;
 }
 
+/* Элементы ввода */
 .input-field-group {
     display: flex;
     flex-direction: column;
@@ -134,6 +140,7 @@ body {
     overflow-y: auto;
 }
 
+/* Кастомные стрелочки селектов */
 .select-wrapper {
     position: relative;
     width: 100%;
@@ -161,6 +168,7 @@ body {
     pointer-events: none;
 }
 
+/* Скрытый инпут файла */
 .file-input-hidden {
     position: absolute !important;
     width: 1px !important;
@@ -175,10 +183,10 @@ body {
     pointer-events: none !important;
 }
 
+/* ================= ИСПРАВЛЕННАЯ ЗОНА ЗАГРУЗКИ / ПРЕВЬЮ ================= */
 .upload-container {
     width: 100%;
-    flex: 1;
-    min-height: 310px;
+    flex-grow: 1;        /* Контейнер заполняет все свободное пространство */
     display: flex;
     flex-direction: column;
 }
@@ -187,8 +195,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    flex: 1;
-    min-height: 310px;
+    flex-grow: 1;        /* Дропзон идеально дотягивается до нижней границы критерия 2 */
     border: 2px dashed #11142d;
     border-radius: 12px;
     background-color: #eef0f6;
@@ -198,6 +205,7 @@ body {
     cursor: pointer;
     transition: background-color 0.2s ease;
     overflow: hidden;
+    position: relative;
 }
 
 .upload-dropzone:hover {
@@ -214,12 +222,22 @@ body {
     display: none;
 }
 
+/* Заглушка текста посередине */
+.image-placeholder-text {
+    font-size: 24px;
+    font-weight: 500;
+    color: #9a9fae;
+}
+
+/* Картинка плавно подстраивается под высоту карточки без деформации */
 .upload-dropzone img {
     display: none;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    max-height: 360px;   /* Ограничение высоты, чтобы картинка не растягивалась чересчур сильно */
+    object-fit: contain; /* Сохраняет оригинальные пропорции */
     border-radius: 10px;
+    padding: 10px;
 }
 
 .upload-dropzone.has-image img {
@@ -238,12 +256,7 @@ body {
     color: #7c8295;
 }
 
-.upload-prompt {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
+/* ================= БЛОК ДАТ (ВНИЗУ) ================= */
 .date-ranges-row {
     display: flex;
     gap: 50px;
@@ -279,7 +292,9 @@ body {
     background-color: #ffffff;
 }
 
-.date-input-field.disabled-date {
+/* Подсветка заблокированной даты серым цветом */
+.date-input-field.disabled-date, 
+.date-input-field:disabled {
     background-color: #eef0f6;
     border-color: #e2e5ed;
     color: #9a9fae;
@@ -293,6 +308,7 @@ body {
     user-select: none;
 }
 
+/* ================= КНОПКИ ДЕЙСТВИЙ (В ОДИН РЯД) ================= */
 .edit-actions-row {
     display: flex;
     gap: 30px;
@@ -301,7 +317,7 @@ body {
 }
 
 .btn-save-changes, .btn-delete-contest {
-    flex: 1;
+    flex: 1; /* Обе кнопки занимают ровно по 50% строки */
     border: none;
     padding: 16px;
     border-radius: 12px;
@@ -312,6 +328,7 @@ body {
     transition: background-color 0.2s ease;
 }
 
+/* Кнопка сохранения изменений */
 .btn-save-changes {
     background-color: #0f2c59;
     color: #ffffff;
@@ -321,6 +338,7 @@ body {
     background-color: #0a1f3f;
 }
 
+/* Кнопка удаления конкурса */
 .btn-delete-contest {
     background-color: #e84a4a;
     color: #ffffff;
@@ -330,6 +348,7 @@ body {
     background-color: #cc3b3b;
 }
 
+/* Сообщения об ошибках */
 .form-error-message {
     background-color: #ffe5e5;
     color: #ff4d4d;

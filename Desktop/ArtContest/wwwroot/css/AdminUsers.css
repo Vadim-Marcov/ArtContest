@@ -376,8 +376,8 @@ body {
 .size-moderator::after { border-top: 5px solid #d97706; }
 
 .size-admin {
-    background-color: #0f2c59;
-    border-color: #0f2c59;
+    background-color: #a16bf8;
+    border-color: #a16bf8;
     width: 190px;
 }
 .text-admin { color: #ffffff; }

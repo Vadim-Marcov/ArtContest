@@ -30,11 +30,13 @@ namespace ArtContest.Controllers
             SetAdminLogin();
             var totalUsers = await _context.Users.CountAsync();
             var activeContests = await _context.Contests.CountAsync(c => c.IdStage != 4);
+            var submissionsOnModeration = await _context.Submissions.CountAsync(s => s.IdModLog == null);
 
             var viewModel = new AdminAnalyticsViewModel
             {
                 TotalUsers = totalUsers,
-                ActiveContests = activeContests
+                ActiveContests = activeContests,
+                SubmissionsOnModeration = submissionsOnModeration
             };
 
             return View(viewModel);
@@ -127,6 +129,7 @@ namespace ArtContest.Controllers
                 .Include(c => c.Stage)
                 .Include(c => c.ApplicationPeriod)
                 .Include(c => c.JudgingPeriod)
+                .Where(c => c.IdStage != 4)
                 .OrderByDescending(c => c.Id)
                 .ToListAsync();
 
@@ -611,6 +614,7 @@ namespace ArtContest.Controllers
     {
         public int TotalUsers { get; set; }
         public int ActiveContests { get; set; }
+        public int SubmissionsOnModeration { get; set; }
     }
 
     public class AdminUsersViewModel

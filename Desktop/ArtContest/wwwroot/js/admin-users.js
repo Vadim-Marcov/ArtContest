@@ -45,7 +45,7 @@ function confirmLogout() {
     currentAction = 'logout';
     document.getElementById('modalTitle').textContent = 'Выход';
     document.getElementById('modalText').textContent = 'Вы уверены, что хотите выйти из аккаунта?';
-    document.getElementById('modalConfirmBtn').className = 'modal-btn modal-btn-confirm';
+    document.getElementById('modalConfirmBtn').className = 'modal-btn modal-btn-danger';
     document.getElementById('modalConfirmBtn').textContent = 'Выйти';
     document.getElementById('modalOverlay').style.display = 'flex';
 }

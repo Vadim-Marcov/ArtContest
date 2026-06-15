@@ -14,6 +14,27 @@ namespace ArtContest.Controllers
             _context = context;
         }
 
+        private int? GetCurrentUserId()
+        {
+            var login = HttpContext.Session.GetString("UserLogin");
+            if (string.IsNullOrEmpty(login)) return null;
+            var user = _context.Users.FirstOrDefault(u => u.Login == login);
+            return user?.Id;
+        }
+
+        private bool IsAdmin()
+        {
+            var roleId = HttpContext.Session.GetString("UserRoleId");
+            return roleId == "1";
+        }
+
+        private IActionResult RequireAdmin()
+        {
+            if (GetCurrentUserId() == null || !IsAdmin())
+                return RedirectToAction("Login", "Auth");
+            return null;
+        }
+
         private void SetAdminLogin()
         {
             var login = HttpContext.Session.GetString("UserLogin");
@@ -27,6 +48,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> Analytics()
         {
+            var auth = RequireAdmin();
+            if (auth != null) return auth;
             SetAdminLogin();
             var totalUsers = await _context.Users.CountAsync();
             var activeContests = await _context.Contests.CountAsync(c => c.IdStage != 4);
@@ -44,6 +67,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> Users(string search = "", string role = "", string sort = "new")
         {
+            var auth = RequireAdmin();
+            if (auth != null) return auth;
             SetAdminLogin();
             var query = _context.Users
                 .Include(u => u.Role)
@@ -85,6 +110,8 @@ namespace ArtContest.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangeUserRole(int userId, int newRoleId)
         {
+            if (GetCurrentUserId() == null || !IsAdmin())
+                return Unauthorized();
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
             {
@@ -110,6 +137,8 @@ namespace ArtContest.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteUser(int userId)
         {
+            if (GetCurrentUserId() == null || !IsAdmin())
+                return Unauthorized();
             var user = await _context.Users.FindAsync(userId);
             if (user == null || user.IdRole == 1)
             {
@@ -123,6 +152,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> Contests()
         {
+            var auth = RequireAdmin();
+            if (auth != null) return auth;
             SetAdminLogin();
             var contests = await _context.Contests
                 .Include(c => c.Category)
@@ -146,6 +177,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> CreateContest()
         {
+            var auth = RequireAdmin();
+            if (auth != null) return auth;
             SetAdminLogin();
             var viewModel = new AdminCreateContestViewModel
             {
@@ -163,6 +196,8 @@ namespace ArtContest.Controllers
             string appStartDate, string appEndDate, string judStartDate, string judEndDate,
             IFormFile contestImage)
         {
+            var auth = RequireAdmin();
+            if (auth != null) return auth;
             SetAdminLogin();
 
             if (category <= 0 || !await _context.ContestCategories.AnyAsync(c => c.Id == category))
@@ -351,6 +386,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> EditContest(int id)
         {
+            var auth = RequireAdmin();
+            if (auth != null) return auth;
             SetAdminLogin();
             var contest = await _context.Contests
                 .Include(c => c.ApplicationPeriod)
@@ -387,6 +424,8 @@ namespace ArtContest.Controllers
             string appStartDate, string appEndDate, string judStartDate, string judEndDate,
             IFormFile contestImage)
         {
+            var auth = RequireAdmin();
+            if (auth != null) return auth;
             SetAdminLogin();
 
             var contest = await _context.Contests
@@ -600,6 +639,8 @@ namespace ArtContest.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteContest(int id)
         {
+            if (GetCurrentUserId() == null || !IsAdmin())
+                return Unauthorized();
             var contest = await _context.Contests.FindAsync(id);
             if (contest != null)
             {

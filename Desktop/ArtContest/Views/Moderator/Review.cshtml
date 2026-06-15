@@ -76,7 +76,7 @@
                         <input type="hidden" name="status" id="verdictStatus" />
 
                         <div class="buttons-verdict-vertical">
-                            <button type="button" class="btn-verdict btn-approve" onclick="setVerdict('Одобрить')">Одобрить</button>
+                            <button type="button" class="btn-verdict btn-approve" onclick="setVerdict('Одобрено')">Одобрить</button>
                             <button type="button" class="btn-verdict btn-fix" onclick="setVerdict('На доработку')">На доработку</button>
                             <button type="button" class="btn-verdict btn-reject" onclick="setVerdict('Отклонено')">Отклонить</button>
                         </div>
@@ -117,7 +117,7 @@
             document.querySelectorAll('.btn-verdict').forEach(function(btn) {
                 btn.style.opacity = '0.5';
             });
-            if (status === 'Одобрить') document.querySelector('.btn-approve').style.opacity = '1';
+            if (status === 'Одобрено') document.querySelector('.btn-approve').style.opacity = '1';
             if (status === 'На доработку') document.querySelector('.btn-fix').style.opacity = '1';
             if (status === 'Отклонено') document.querySelector('.btn-reject').style.opacity = '1';
         }

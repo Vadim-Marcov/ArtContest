@@ -25,7 +25,12 @@
         <header class="content-header">
             <h1 class="page-title">Архив конкурсов</h1>
             <div class="user-profile-trigger">
-                <div class="user-avatar-mini"></div>
+                <div class="user-avatar-mini">
+                    @if (ViewBag.CurrentUser != null && !string.IsNullOrEmpty(ViewBag.CurrentUser.ProfilePhoto))
+                    {
+                        <img src="@Url.Content("~/images/" + ViewBag.CurrentUser.ProfilePhoto)" alt="Фото профиля" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />
+                    }
+                </div>
             </div>
         </header>
 

@@ -22,11 +22,25 @@ namespace ArtContest.Controllers
             return user?.Id;
         }
 
+        private bool IsModerator()
+        {
+            var roleId = HttpContext.Session.GetString("UserRoleId");
+            return roleId == "2";
+        }
+
+        private IActionResult RequireModerator()
+        {
+            if (GetCurrentUserId() == null || !IsModerator())
+                return RedirectToAction("Login", "Auth");
+            return null;
+        }
+
         public async Task<IActionResult> Home(string search = "", string category = "")
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireModerator();
+            if (auth != null) return auth;
 
+            var userId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
             ViewBag.ModeratorLogin = user?.Login ?? "Модератор";
 
@@ -60,8 +74,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> ContestItems(int id)
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireModerator();
+            if (auth != null) return auth;
 
             var contest = await _context.Contests
                 .Include(c => c.Category)
@@ -83,8 +97,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> Review(int submissionId)
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireModerator();
+            if (auth != null) return auth;
 
             var submission = await _context.Submissions
                 .Include(s => s.User)
@@ -102,8 +116,8 @@ namespace ArtContest.Controllers
         [HttpPost]
         public async Task<IActionResult> Review(int submissionId, string status, string comment)
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireModerator();
+            if (auth != null) return auth;
 
             var submission = await _context.Submissions
                 .Include(s => s.ModeratorLog)
@@ -125,6 +139,7 @@ namespace ArtContest.Controllers
                 return View();
             }
 
+            var userId = GetCurrentUserId();
             var modLog = new ModeratorLog
             {
                 Status = status,
@@ -145,9 +160,10 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> Log(string search = "", string contest = "", string status = "")
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireModerator();
+            if (auth != null) return auth;
 
+            var userId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
             ViewBag.ModeratorLogin = user?.Login ?? "Модератор";
 
@@ -155,7 +171,7 @@ namespace ArtContest.Controllers
                 .Include(s => s.User)
                 .Include(s => s.Contest)
                 .Include(s => s.ModeratorLog)
-                .Where(s => s.IdModLog != null)
+                .Where(s => s.IdModLog != null && s.ModeratorLog != null && s.ModeratorLog.IdUser == userId)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))

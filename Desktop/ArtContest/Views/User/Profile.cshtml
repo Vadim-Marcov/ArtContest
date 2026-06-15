@@ -135,9 +135,23 @@
                                     </td>
                                     <td class="comment-td">@(string.IsNullOrEmpty(submission.ModeratorLog?.ModComment) ? "—" : submission.ModeratorLog.ModComment)</td>
                                     <td class="comment-td">
-                                        @if (!string.IsNullOrEmpty(submission.AuthorDescription))
+                                        @if (submission.JuryAssessments.Any())
                                         {
-                                            @submission.AuthorDescription
+                                            <div class="jury-comments-list">
+                                                @foreach (var jury in submission.JuryAssessments)
+                                                {
+                                                    <div class="jury-item">
+                                                        @if (!string.IsNullOrEmpty(jury.JuryComment))
+                                                        {
+                                                            @jury.JuryComment
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>—</text>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
                                         }
                                         else
                                         {

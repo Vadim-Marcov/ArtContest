@@ -37,6 +37,7 @@ namespace ArtContest.Controllers
             var submissions = await _context.Submissions
                 .Include(s => s.Contest)
                 .Include(s => s.ModeratorLog)
+                .Include(s => s.JuryAssessments)
                 .Where(s => s.IdUser == userId)
                 .OrderByDescending(s => s.Id)
                 .ToListAsync();
@@ -51,11 +52,16 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> Home(string search = "", string category = "", string sort = "new")
         {
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+
             var query = _context.Contests
                 .Include(c => c.Category)
                 .Include(c => c.ApplicationPeriod)
                 .Include(c => c.Stage)
                 .Where(c => c.IdStage == 1 || c.IdStage == 2)
+                .Where(c => c.ApplicationPeriod != null
+                    && c.ApplicationPeriod.AppStartDate.CompareTo(today) <= 0
+                    && c.ApplicationPeriod.AppEndDate.CompareTo(today) >= 0)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -75,11 +81,14 @@ namespace ArtContest.Controllers
             var categories = await _context.ContestCategories.ToListAsync();
             var userId = GetCurrentUserId();
 
+            var currentUser = userId != null ? await _context.Users.FindAsync(userId.Value) : null;
+
             ViewBag.Categories = categories;
             ViewBag.Search = search;
             ViewBag.SelectedCategory = category;
             ViewBag.Sort = sort;
             ViewBag.UserId = userId;
+            ViewBag.CurrentUser = currentUser;
 
             return View(contests);
         }
@@ -194,18 +203,48 @@ namespace ArtContest.Controllers
             var contests = await _context.Contests
                 .Include(c => c.ApplicationPeriod)
                 .Include(c => c.Category)
-                .Where(c => c.IdStage == 1)
+                .Where(c => c.IdStage == 1 || c.IdStage == 2)
                 .OrderByDescending(c => c.Id)
                 .ToListAsync();
 
-            var existingSubmissionIds = await _context.Submissions
-                .Where(s => s.IdUser == userId)
-                .Select(s => s.IdContest)
+            ViewBag.ContestId = contestId;
+
+            if (contestId.HasValue)
+            {
+                var submission = await _context.Submissions
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.IdUser == userId && s.IdContest == contestId.Value);
+
+                if (submission != null)
+                {
+                    var modLog = await _context.ModeratorLogs
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(m => m.Id == submission.IdModLog);
+
+                    if (modLog != null && modLog.Status == "На доработку")
+                    {
+                        ViewBag.RevisionTitle = submission.Title;
+                        ViewBag.RevisionDescription = submission.AuthorDescription ?? "";
+                        ViewBag.RevisionComment = modLog.ModComment ?? "";
+                        ViewBag.IsRevision = true;
+                    }
+                }
+            }
+
+            return View(contests);
+        }
+
+        private async Task<IActionResult> SubmitGetInternal(int? contestId = null)
+        {
+            var contests = await _context.Contests
+                .Include(c => c.ApplicationPeriod)
+                .Include(c => c.Category)
+                .Where(c => c.IdStage == 1 || c.IdStage == 2)
+                .OrderByDescending(c => c.Id)
                 .ToListAsync();
 
             ViewBag.ContestId = contestId;
-            ViewBag.ExistingSubmissionIds = existingSubmissionIds;
-            return View(contests);
+            return View("Submit", contests);
         }
 
         [HttpPost]
@@ -217,7 +256,7 @@ namespace ArtContest.Controllers
             if (contestId <= 0)
             {
                 ViewBag.Error = "Выберите конкурс";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
 
             var contest = await _context.Contests
@@ -227,33 +266,33 @@ namespace ArtContest.Controllers
             if (contest == null || contest.IdStage != 1)
             {
                 ViewBag.Error = "Конкурс не найден или приём заявок завершён";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
 
             if (string.IsNullOrWhiteSpace(title) || title.Trim().Length < 3)
             {
                 ViewBag.Error = "Название работы должно содержать минимум 3 символа";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
             if (title.Trim().Length > 200)
             {
                 ViewBag.Error = "Название работы не может превышать 200 символов";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
             if (string.IsNullOrWhiteSpace(description) || description.Trim().Length < 10)
             {
                 ViewBag.Error = "Описание должно содержать минимум 10 символов";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
             if (description.Trim().Length > 5000)
             {
                 ViewBag.Error = "Описание не может превышать 5000 символов";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
             if (artFile == null || artFile.Length == 0)
             {
                 ViewBag.Error = "Загрузите изображение работы";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
@@ -261,26 +300,65 @@ namespace ArtContest.Controllers
             if (!allowedExtensions.Contains(ext))
             {
                 ViewBag.Error = "Допустимые форматы: JPG, JPEG, PNG";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
             if (artFile.Length > 10 * 1024 * 1024)
             {
                 ViewBag.Error = "Размер файла не может превышать 10 МБ";
-                return await Submit(contestId);
+                return await SubmitGetInternal(contestId);
             }
 
             var existingSubmission = await _context.Submissions
+                .Include(s => s.ModeratorLog)
                 .FirstOrDefaultAsync(s => s.IdUser == userId && s.IdContest == contestId);
+
             if (existingSubmission != null)
             {
-                ViewBag.Error = "Вы уже подали заявку на этот конкурс";
-                return await Submit(contestId);
+                bool wasRevision = existingSubmission.ModeratorLog != null
+                    && existingSubmission.ModeratorLog.Status == "На доработку";
+
+                if (!wasRevision)
+                {
+                    ViewBag.Error = "Вы уже подали заявку на этот конкурс";
+                    return await SubmitGetInternal(contestId);
+                }
+
+                var modLogId = existingSubmission.IdModLog;
+
+                var fileName = Guid.NewGuid().ToString() + ext;
+                var filePath = Path.Combine("wwwroot", "images", "submissions", fileName);
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await artFile.CopyToAsync(stream);
+                }
+
+                existingSubmission.Title = title.Trim();
+                existingSubmission.SubmissionImage = "submissions/" + fileName;
+                existingSubmission.SubmissionDate = DateTime.Now.ToString("yyyy-MM-dd");
+                existingSubmission.AuthorDescription = description.Trim();
+                existingSubmission.IdModLog = null;
+                existingSubmission.TotalScore = null;
+
+                if (modLogId.HasValue)
+                {
+                    var modLog = await _context.ModeratorLogs.FindAsync(modLogId.Value);
+                    if (modLog != null)
+                    {
+                        _context.ModeratorLogs.Remove(modLog);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Заявка обновлена и отправлена на повторную модерацию!";
+                return RedirectToAction("Profile");
             }
 
-            var fileName = Guid.NewGuid().ToString() + ext;
-            var filePath = Path.Combine("wwwroot", "images", "submissions", fileName);
-            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            var newFileName = Guid.NewGuid().ToString() + ext;
+            var newFilePath = Path.Combine("wwwroot", "images", "submissions", newFileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(newFilePath)!);
+            using (var stream = new FileStream(newFilePath, FileMode.Create))
             {
                 await artFile.CopyToAsync(stream);
             }
@@ -288,7 +366,7 @@ namespace ArtContest.Controllers
             var submission = new Submission
             {
                 Title = title.Trim(),
-                SubmissionImage = "submissions/" + fileName,
+                SubmissionImage = "submissions/" + newFileName,
                 SubmissionDate = DateTime.Now.ToString("yyyy-MM-dd"),
                 AuthorDescription = description.Trim(),
                 IdUser = userId.Value,
@@ -324,11 +402,14 @@ namespace ArtContest.Controllers
 
             var contests = await query.ToListAsync();
             var categories = await _context.ContestCategories.ToListAsync();
+            var userId = GetCurrentUserId();
+            var currentUser = userId != null ? await _context.Users.FindAsync(userId.Value) : null;
 
             ViewBag.Categories = categories;
             ViewBag.Search = search;
             ViewBag.SelectedCategory = category;
             ViewBag.Sort = sort;
+            ViewBag.CurrentUser = currentUser;
 
             return View(contests);
         }

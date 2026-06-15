@@ -1,12 +1,13 @@
 @model List<ArtContest.Models.Contest>
 @{
-    var selectedContestId = ViewBag.ContestId as int?;
-    var existingSubmissionIds = ViewBag.ExistingSubmissionIds as List<int> ?? new List<int>();
-    var firstContest = selectedContestId.HasValue
-        ? Model.FirstOrDefault(c => c.Id == selectedContestId.Value)
-        : (Model.Any() ? Model.First() : null);
-    var contestTitle = firstContest?.Title ?? "Конкурс";
-    var contestRules = firstContest?.Rules ?? "";
+    var contestId = ViewBag.ContestId as int?;
+    var contest = contestId.HasValue ? Model.FirstOrDefault(c => c.Id == contestId.Value) : (Model.Any() ? Model.First() : null);
+    var contestTitle = contest?.Title ?? "Конкурс";
+    var contestRules = contest?.Rules ?? "";
+    var isRevision = ViewBag.IsRevision is true;
+    var revisionTitle = ViewBag.RevisionTitle as string ?? "";
+    var revisionDescription = ViewBag.RevisionDescription as string ?? "";
+    var revisionComment = ViewBag.RevisionComment as string ?? "";
 }
 
 <!DOCTYPE html>
@@ -51,59 +52,55 @@
             </div>
         </section>
 
-        <div class="submission-grid">
-            <div class="upload-container">
-                <input type="file" id="art-upload" name="artFile" accept="image/png, image/jpeg" class="file-input-hidden">
-                <label for="art-upload" class="upload-dropzone" id="dropzone-label">
-                    <div class="upload-prompt" id="uploadPrompt">
-                        <p class="main-prompt">Перетащите файл сюда</p>
-                        <p class="sub-prompt">JPG, PNG до 10MB</p>
-                    </div>
-                </label>
+        @if (isRevision)
+        {
+            <div class="revision-notice">
+                <div class="revision-notice-header">
+                    <span>Работа отправлена на доработку</span>
+                </div>
+                <div class="revision-comment">
+                    <p class="revision-comment-label">Комментарий модератора:</p>
+                    <p class="revision-comment-text">@revisionComment</p>
+                </div>
             </div>
+        }
 
-            <form class="submission-form" method="post" action="/User/Submit" enctype="multipart/form-data" onsubmit="return validateSubmitForm()">
-                <div class="form-card">
-                    <h2 class="form-card-title">Подача заявки</h2>
-
-                    @if (Model.Count > 1)
-                    {
-                        <div class="input-field-group">
-                            <label class="input-label">Конкурс</label>
-                            <select name="contestId" class="text-input" required>
-                                <option value="">Выберите конкурс</option>
-                                @foreach (var c in Model)
-                                {
-                                    var cSel = selectedContestId == c.Id ? "selected" : null;
-                                    var disabledAttr = existingSubmissionIds.Contains(c.Id) ? "disabled" : null;
-                                    <option value="@c.Id" selected="@cSel" disabled="@disabledAttr">@c.Title@(existingSubmissionIds.Contains(c.Id) ? " (заявка подана)" : "")</option>
-                                }
-                            </select>
+        @if (contest != null)
+        {
+            <form class="submission-grid" method="post" action="/User/Submit?contestId=@contest.Id" enctype="multipart/form-data" onsubmit="return validateSubmitForm()">
+                <div class="upload-container">
+                    <input type="file" id="art-upload" name="artFile" accept="image/png, image/jpeg" class="file-input-hidden">
+                    <label for="art-upload" class="upload-dropzone" id="dropzone-label">
+                        <div class="upload-prompt" id="uploadPrompt">
+                            <p class="main-prompt">Перетащите файл сюда</p>
+                            <p class="sub-prompt">JPG, PNG до 10MB</p>
                         </div>
-                    }
-                    else if (Model.Count == 1)
-                    {
-                        <input type="hidden" name="contestId" value="@Model.First().Id" />
-                    }
-                    else
-                    {
-                        <div class="form-error-message">Нет активных конкурсов для подачи заявки</div>
-                    }
+                    </label>
+                </div>
+
+                <div class="form-card">
+                    <h2 class="form-card-title">@(isRevision ? "Доработка заявки" : "Подача заявки")</h2>
 
                     <div class="input-field-group">
                         <label class="input-label">Название работы</label>
-                        <input type="text" name="title" class="text-input" placeholder="Введите название" required minlength="3" maxlength="200">
+                        <input type="text" name="title" class="text-input" placeholder="Введите название" required minlength="3" maxlength="200" value="@(isRevision ? revisionTitle : "")">
                     </div>
 
                     <div class="input-field-group">
                         <label class="input-label">Описание</label>
-                        <textarea name="description" class="text-area-input" placeholder="Расскажите о работе" rows="8" required minlength="10" maxlength="5000"></textarea>
+                        <textarea name="description" class="text-area-input" placeholder="Расскажите о работе" rows="8" required minlength="10" maxlength="5000">@(isRevision ? revisionDescription : "")</textarea>
                     </div>
 
-                    <button type="submit" class="btn-submit-work">Отправить работу</button>
+                    <button type="submit" class="btn-submit-work">@(isRevision ? "Отправить на повторную модерацию" : "Отправить работу")</button>
                 </div>
             </form>
-        </div>
+        }
+        else
+        {
+            <div class="no-contests-message">
+                Нет доступных конкурсов для подачи заявки
+            </div>
+        }
     </main>
 
     <script>
@@ -132,10 +129,8 @@
         function validateSubmitForm() {
             var title = document.querySelector('[name="title"]').value.trim();
             var desc = document.querySelector('[name="description"]').value.trim();
-            var file = document.getElementById('art-upload');
             if (!title || title.length < 3) { alert('Название работы должно содержать минимум 3 символа'); return false; }
             if (!desc || desc.length < 10) { alert('Описание должно содержать минимум 10 символов'); return false; }
-            if (!file || !file.files || file.files.length === 0) { alert('Загрузите изображение работы'); return false; }
             return true;
         }
     </script>

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj": {}
+    "c:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj": {
+    "c:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj",
+        "projectUniqueName": "c:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj",
         "projectName": "ArtContest",
-        "projectPath": "C:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj",
+        "projectPath": "c:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj",
         "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user\\Desktop\\ArtContest\\obj\\",
+        "outputPath": "c:\\Users\\user\\Desktop\\ArtContest\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

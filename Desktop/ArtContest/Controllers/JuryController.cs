@@ -22,11 +22,25 @@ namespace ArtContest.Controllers
             return user?.Id;
         }
 
+        private bool IsJury()
+        {
+            var roleId = HttpContext.Session.GetString("UserRoleId");
+            return roleId == "3";
+        }
+
+        private IActionResult RequireJury()
+        {
+            if (GetCurrentUserId() == null || !IsJury())
+                return RedirectToAction("Login", "Auth");
+            return null;
+        }
+
         public async Task<IActionResult> Home(string search = "", string category = "", string sort = "new")
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireJury();
+            if (auth != null) return auth;
 
+            var userId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
             ViewBag.JuryLogin = user?.Login ?? "Член жюри";
 
@@ -63,8 +77,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> ContestItems(int id)
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireJury();
+            if (auth != null) return auth;
 
             var contest = await _context.Contests
                 .Include(c => c.Category)
@@ -80,6 +94,7 @@ namespace ArtContest.Controllers
                 .OrderByDescending(s => s.Id)
                 .ToListAsync();
 
+            var userId = GetCurrentUserId();
             var assessedSubmissionIds = await _context.JuryAssessments
                 .Where(a => a.IdUser == userId)
                 .Select(a => a.IdSubmission)
@@ -93,8 +108,8 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> Review(int submissionId)
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireJury();
+            if (auth != null) return auth;
 
             var submission = await _context.Submissions
                 .Include(s => s.User)
@@ -106,6 +121,7 @@ namespace ArtContest.Controllers
 
             if (submission == null) return RedirectToAction("Home");
 
+            var userId = GetCurrentUserId();
             var existingAssessment = await _context.JuryAssessments
                 .FirstOrDefaultAsync(a => a.IdSubmission == submissionId && a.IdUser == userId);
 
@@ -118,8 +134,8 @@ namespace ArtContest.Controllers
         [HttpPost]
         public async Task<IActionResult> Review(int submissionId, int score1, int score2, string juryComment)
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireJury();
+            if (auth != null) return auth;
 
             var submission = await _context.Submissions
                 .Include(s => s.Contest)
@@ -148,6 +164,7 @@ namespace ArtContest.Controllers
                 return View();
             }
 
+            var userId = GetCurrentUserId();
             var existingAssessment = await _context.JuryAssessments
                 .FirstOrDefaultAsync(a => a.IdSubmission == submissionId && a.IdUser == userId);
 
@@ -188,9 +205,10 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> History(string search = "", string contest = "", string category = "")
         {
-            var userId = GetCurrentUserId();
-            if (userId == null) return RedirectToAction("Login", "Auth");
+            var auth = RequireJury();
+            if (auth != null) return auth;
 
+            var userId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
             ViewBag.JuryLogin = user?.Login ?? "Член жюри";
 

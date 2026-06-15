@@ -238,6 +238,7 @@ C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.csproj.CoreCompileI
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.RazorAssemblyInfo.cache
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.RazorAssemblyInfo.cs
+C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.sourcelink.json
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\rjimswa.dswa.cache.json
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
@@ -252,4 +253,3 @@ C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\refint\ArtContest.dll
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.pdb
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.genruntimeconfig.cache
 C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ref\ArtContest.dll
-C:\Users\user\Desktop\ArtContest\obj\Debug\net8.0\ArtContest.sourcelink.json

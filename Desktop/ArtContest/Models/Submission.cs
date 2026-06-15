@@ -35,5 +35,7 @@ namespace ArtContest.Models
         [ForeignKey("ModeratorLog")]
         public int? IdModLog { get; set; }
         public ModeratorLog? ModeratorLog { get; set; }
+
+        public List<JuryAssessment> JuryAssessments { get; set; } = new();
     }
 }

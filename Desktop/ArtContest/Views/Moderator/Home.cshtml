@@ -53,6 +53,18 @@
                     }
                 </select>
             </div>
+
+            <div class="select-wrapper">
+                <select name="sort" class="filter-select" onchange="this.form.submit()">
+                    @{
+                        var modSortNew = ViewBag.Sort == "new" || string.IsNullOrEmpty(ViewBag.Sort) ? "selected" : null;
+                        var modSortOld = ViewBag.Sort == "old" ? "selected" : null;
+                    }
+                    <option value="new" selected="@modSortNew">Сначала новые</option>
+                    <option value="old" selected="@modSortOld">Сначала старые</option>
+                </select>
+            </div>
+
         </form>
 
         <section class="contests-grid">

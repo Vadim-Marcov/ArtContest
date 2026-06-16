@@ -51,9 +51,9 @@
                 <div class="upload-container">
                     @if (!string.IsNullOrEmpty(submission.SubmissionImage))
                     {
-                        <div class="upload-dropzone" style="border-style:solid;">
+                        <div class="upload-dropzone uploaded-state">
                             <div class="upload-prompt">
-                                <img src="@Url.Content("~/images/" + submission.SubmissionImage)" alt="@submission.Title" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;" />
+                                <img src="@Url.Content("~/images/" + submission.SubmissionImage)" alt="@submission.Title" />
                             </div>
                         </div>
                     }

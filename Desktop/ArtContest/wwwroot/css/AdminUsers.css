@@ -72,11 +72,18 @@ body {
 }
 
 .main-content::-webkit-scrollbar {
-    display: none;
+    width: 6px;
+}
+.main-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.main-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
 }
 .main-content {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: auto;
+    scrollbar-width: thin;
 }
 
 .content-header {
@@ -228,7 +235,7 @@ body {
     border-radius: 16px;
     border: 1px solid #eef0f6;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 .log-table {
@@ -236,7 +243,7 @@ body {
     border-collapse: collapse;
     text-align: left;
     font-size: 14px;
-    table-layout: fixed;
+    min-width: 600px;
 }
 
 .log-table th {
@@ -248,18 +255,7 @@ body {
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-}
-
-.log-table th:first-child {
-    width: 40%;
-}
-
-.log-table th:nth-child(2) {
-    width: 35%;
-}
-
-.log-table th:last-child {
-    width: 25%;
+    white-space: nowrap;
 }
 
 .log-table td {
@@ -267,9 +263,6 @@ body {
     color: #11142d;
     border-bottom: 1px solid #eef0f6;
     vertical-align: middle;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .log-table tbody tr:hover {

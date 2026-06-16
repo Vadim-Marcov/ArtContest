@@ -35,7 +35,7 @@ namespace ArtContest.Controllers
             return null;
         }
 
-        public async Task<IActionResult> Home(string search = "", string category = "")
+        public async Task<IActionResult> Home(string search = "", string category = "", string sort = "new")
         {
             var auth = RequireModerator();
             if (auth != null) return auth;
@@ -56,7 +56,13 @@ namespace ArtContest.Controllers
             if (!string.IsNullOrEmpty(category) && int.TryParse(category, out int catId))
                 query = query.Where(c => c.IdCategory == catId);
 
-            var contests = await query.OrderByDescending(c => c.Id).ToListAsync();
+            query = sort switch
+            {
+                "old" => query.OrderBy(c => c.Id),
+                _ => query.OrderByDescending(c => c.Id)
+            };
+
+            var contests = await query.ToListAsync();
             var categories = await _context.ContestCategories.ToListAsync();
 
             foreach (var contest in contests)
@@ -68,6 +74,7 @@ namespace ArtContest.Controllers
             ViewBag.Categories = categories;
             ViewBag.Search = search;
             ViewBag.SelectedCategory = category;
+            ViewBag.Sort = sort;
 
             return View(contests);
         }

@@ -195,7 +195,7 @@ namespace ArtContest.Controllers
 
             if (allAssessments.Any())
             {
-                submission.TotalScore = allAssessments.Sum(a => (double)(a.Score1 + a.Score2));
+                submission.TotalScore = Math.Round(allAssessments.Average(a => (double)(a.Score1 + a.Score2)), 2);
                 await _context.SaveChangesAsync();
             }
 

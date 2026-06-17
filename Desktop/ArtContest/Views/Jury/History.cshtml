@@ -61,16 +61,13 @@
             </div>
 
             <div class="select-wrapper">
-                <select name="category" class="filter-select" onchange="this.form.submit()">
+                <select name="sort" class="filter-select" onchange="this.form.submit()">
                     @{
-                        var hCatSel = string.IsNullOrEmpty(ViewBag.SelectedCategory) ? "selected" : null;
+                        var hSortNew = ViewBag.Sort == "new" || string.IsNullOrEmpty(ViewBag.Sort) ? "selected" : null;
+                        var hSortOld = ViewBag.Sort == "old" ? "selected" : null;
                     }
-                    <option value="" selected="@hCatSel">Категория</option>
-                    @foreach (var cat in ViewBag.Categories as List<ArtContest.Models.ContestCategory>)
-                    {
-                        var hCatItemSel = ViewBag.SelectedCategory == cat.Id.ToString() ? "selected" : null;
-                        <option value="@cat.Id" selected="@hCatItemSel">@cat.CategoryName</option>
-                    }
+                    <option value="new" selected="@hSortNew">Сначала новые</option>
+                    <option value="old" selected="@hSortOld">Сначала старые</option>
                 </select>
             </div>
         </form>

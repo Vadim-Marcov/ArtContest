@@ -65,9 +65,8 @@
 
             <div class="select-wrapper">
                 <select name="sort" class="filter-select" onchange="document.getElementById('filterForm').submit()">
-                    <!option value="new" @(sort == "new" ? "selected" : "")>Сначала новые</!option>
+                    <!option value="new" @(sort == "new" || string.IsNullOrEmpty(sort) ? "selected" : "")>Сначала новые</!option>
                     <!option value="old" @(sort == "old" ? "selected" : "")>Сначала старые</!option>
-                    <!option value="alphabet" @(sort == "alphabet" ? "selected" : "")>По алфавиту</!option>
                 </select>
             </div>
         </form>

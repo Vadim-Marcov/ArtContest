@@ -88,7 +88,6 @@ namespace ArtContest.Controllers
             query = sort switch
             {
                 "old" => query.OrderBy(u => u.Id),
-                "alphabet" => query.OrderBy(u => u.Login),
                 _ => query.OrderByDescending(u => u.Id)
             };
 

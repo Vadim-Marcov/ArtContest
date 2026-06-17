@@ -37,7 +37,7 @@
     border-radius: 16px;
     border: 1px solid #eef0f6;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 /* Стили для даты проверки в таблице */
@@ -58,6 +58,7 @@
     border-collapse: collapse;
     text-align: left;
     font-size: 14px;
+    min-width: 600px;
 }
 
 .log-table th {

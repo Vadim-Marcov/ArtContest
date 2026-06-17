@@ -35,6 +35,41 @@ namespace ArtContest.Controllers
             return null;
         }
 
+        private async Task UpdateContestStages()
+        {
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+            var allContests = await _context.Contests
+                .Include(c => c.ApplicationPeriod)
+                .Include(c => c.JudgingPeriod)
+                .ToListAsync();
+
+            foreach (var contest in allContests)
+            {
+                if (contest.ApplicationPeriod == null || contest.JudgingPeriod == null)
+                    continue;
+
+                var appEndDate = contest.ApplicationPeriod.AppEndDate;
+                var judStartDate = contest.JudgingPeriod.JudStartDate;
+                var judEndDate = contest.JudgingPeriod.JudEndDate;
+                var appStartDate = contest.ApplicationPeriod.AppStartDate;
+
+                int newStage;
+                if (judEndDate.CompareTo(today) < 0)
+                    newStage = 4;
+                else if (appEndDate.CompareTo(today) < 0)
+                    newStage = 3;
+                else if (appStartDate.CompareTo(today) <= 0)
+                    newStage = 2;
+                else
+                    newStage = 1;
+
+                if (contest.IdStage != newStage)
+                    contest.IdStage = newStage;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IActionResult> Home(string search = "", string category = "", string sort = "new")
         {
             var auth = RequireModerator();
@@ -43,6 +78,8 @@ namespace ArtContest.Controllers
             var userId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
             ViewBag.ModeratorLogin = user?.Login ?? "Модератор";
+
+            await UpdateContestStages();
 
             var query = _context.Contests
                 .Include(c => c.Category)
@@ -174,6 +211,8 @@ namespace ArtContest.Controllers
             var user = await _context.Users.FindAsync(userId);
             ViewBag.ModeratorLogin = user?.Login ?? "Модератор";
 
+            await UpdateContestStages();
+
             var query = _context.Submissions
                 .Include(s => s.User)
                 .Include(s => s.Contest)
@@ -193,7 +232,7 @@ namespace ArtContest.Controllers
             var submissions = await query.OrderByDescending(s => s.Id).ToListAsync();
 
             var contests = await _context.Contests
-                .Where(c => c.IdStage == 1 || c.IdStage == 2 || c.IdStage == 3 || c.IdStage == 4)
+                .Where(c => c.IdStage == 2)
                 .OrderByDescending(c => c.Id)
                 .ToListAsync();
 

@@ -63,12 +63,10 @@
                 <select name="sort" class="filter-select" onchange="this.form.submit()">
                     @{
                         var homeSortNew = ViewBag.Sort == "new" || string.IsNullOrEmpty(ViewBag.Sort) ? "selected" : null;
-                        var homeSortAsc = ViewBag.Sort == "asc" ? "selected" : null;
-                        var homeSortDesc = ViewBag.Sort == "desc" ? "selected" : null;
+                        var homeSortOld = ViewBag.Sort == "old" ? "selected" : null;
                     }
                     <option value="new" selected="@homeSortNew">Сначала новые</option>
-                    <option value="asc" selected="@homeSortAsc">А-Я</option>
-                    <option value="desc" selected="@homeSortDesc">Я-А</option>
+                    <option value="old" selected="@homeSortOld">Сначала старые</option>
                 </select>
             </div>
         </form>

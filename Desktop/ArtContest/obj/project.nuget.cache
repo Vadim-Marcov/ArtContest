@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pXVMuciQ03E=",
+  "dgSpecHash": "RRxx5TWe2VM=",
   "success": true,
-  "projectFilePath": "c:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj",
+  "projectFilePath": "C:\\Users\\user\\Desktop\\ArtContest\\ArtContest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\user\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",

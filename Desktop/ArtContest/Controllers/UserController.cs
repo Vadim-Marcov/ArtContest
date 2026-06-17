@@ -50,15 +50,51 @@ namespace ArtContest.Controllers
             };
         }
 
+        private async Task UpdateContestStages()
+        {
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+            var allContests = await _context.Contests
+                .Include(c => c.ApplicationPeriod)
+                .Include(c => c.JudgingPeriod)
+                .ToListAsync();
+
+            foreach (var contest in allContests)
+            {
+                if (contest.ApplicationPeriod == null || contest.JudgingPeriod == null)
+                    continue;
+
+                var appEndDate = contest.ApplicationPeriod.AppEndDate;
+                var judEndDate = contest.JudgingPeriod.JudEndDate;
+                var appStartDate = contest.ApplicationPeriod.AppStartDate;
+
+                int newStage;
+                if (judEndDate.CompareTo(today) < 0)
+                    newStage = 4;
+                else if (appEndDate.CompareTo(today) < 0)
+                    newStage = 3;
+                else if (appStartDate.CompareTo(today) <= 0)
+                    newStage = 2;
+                else
+                    newStage = 1;
+
+                if (contest.IdStage != newStage)
+                    contest.IdStage = newStage;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IActionResult> Home(string search = "", string category = "", string sort = "new")
         {
+            await UpdateContestStages();
+
             var today = DateTime.Now.ToString("yyyy-MM-dd");
 
             var query = _context.Contests
                 .Include(c => c.Category)
                 .Include(c => c.ApplicationPeriod)
                 .Include(c => c.Stage)
-                .Where(c => c.IdStage == 1 || c.IdStage == 2)
+                .Where(c => c.IdStage == 2)
                 .Where(c => c.ApplicationPeriod != null
                     && c.ApplicationPeriod.AppStartDate.CompareTo(today) <= 0
                     && c.ApplicationPeriod.AppEndDate.CompareTo(today) >= 0)
@@ -72,8 +108,7 @@ namespace ArtContest.Controllers
 
             query = sort switch
             {
-                "asc" => query.OrderBy(c => c.Title),
-                "desc" => query.OrderByDescending(c => c.Title),
+                "old" => query.OrderBy(c => c.Id),
                 _ => query.OrderByDescending(c => c.Id)
             };
 
@@ -200,10 +235,17 @@ namespace ArtContest.Controllers
             var userId = GetCurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Auth");
 
+            await UpdateContestStages();
+
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+
             var contests = await _context.Contests
                 .Include(c => c.ApplicationPeriod)
                 .Include(c => c.Category)
-                .Where(c => c.IdStage == 1 || c.IdStage == 2)
+                .Where(c => c.IdStage == 2)
+                .Where(c => c.ApplicationPeriod != null
+                    && c.ApplicationPeriod.AppStartDate.CompareTo(today) <= 0
+                    && c.ApplicationPeriod.AppEndDate.CompareTo(today) >= 0)
                 .OrderByDescending(c => c.Id)
                 .ToListAsync();
 
@@ -236,10 +278,17 @@ namespace ArtContest.Controllers
 
         private async Task<IActionResult> SubmitGetInternal(int? contestId = null)
         {
+            await UpdateContestStages();
+
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+
             var contests = await _context.Contests
                 .Include(c => c.ApplicationPeriod)
                 .Include(c => c.Category)
-                .Where(c => c.IdStage == 1 || c.IdStage == 2)
+                .Where(c => c.IdStage == 2)
+                .Where(c => c.ApplicationPeriod != null
+                    && c.ApplicationPeriod.AppStartDate.CompareTo(today) <= 0
+                    && c.ApplicationPeriod.AppEndDate.CompareTo(today) >= 0)
                 .OrderByDescending(c => c.Id)
                 .ToListAsync();
 
@@ -263,7 +312,9 @@ namespace ArtContest.Controllers
                 .Include(c => c.ApplicationPeriod)
                 .FirstOrDefaultAsync(c => c.Id == contestId);
 
-            if (contest == null || contest.IdStage != 1)
+            if (contest == null || contest.IdStage != 2 || contest.ApplicationPeriod == null
+                || contest.ApplicationPeriod.AppStartDate.CompareTo(DateTime.Now.ToString("yyyy-MM-dd")) > 0
+                || contest.ApplicationPeriod.AppEndDate.CompareTo(DateTime.Now.ToString("yyyy-MM-dd")) < 0)
             {
                 ViewBag.Error = "Конкурс не найден или приём заявок завершён";
                 return await SubmitGetInternal(contestId);
@@ -382,10 +433,15 @@ namespace ArtContest.Controllers
 
         public async Task<IActionResult> Gallery(string search = "", string category = "", string sort = "new")
         {
+            await UpdateContestStages();
+
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+
             var query = _context.Contests
                 .Include(c => c.Category)
                 .Include(c => c.ApplicationPeriod)
-                .Where(c => c.IdStage == 4)
+                .Include(c => c.JudgingPeriod)
+                .Where(c => c.IdStage == 4 || (c.JudgingPeriod != null && c.JudgingPeriod.JudEndDate.CompareTo(today) < 0))
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))

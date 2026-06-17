@@ -35,6 +35,41 @@ namespace ArtContest.Controllers
             return null;
         }
 
+        private async Task UpdateContestStages()
+        {
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+            var allContests = await _context.Contests
+                .Include(c => c.ApplicationPeriod)
+                .Include(c => c.JudgingPeriod)
+                .ToListAsync();
+
+            foreach (var contest in allContests)
+            {
+                if (contest.ApplicationPeriod == null || contest.JudgingPeriod == null)
+                    continue;
+
+                var appEndDate = contest.ApplicationPeriod.AppEndDate;
+                var judStartDate = contest.JudgingPeriod.JudStartDate;
+                var judEndDate = contest.JudgingPeriod.JudEndDate;
+                var appStartDate = contest.ApplicationPeriod.AppStartDate;
+
+                int newStage;
+                if (judEndDate.CompareTo(today) < 0)
+                    newStage = 4;
+                else if (appEndDate.CompareTo(today) < 0)
+                    newStage = 3;
+                else if (appStartDate.CompareTo(today) <= 0)
+                    newStage = 2;
+                else
+                    newStage = 1;
+
+                if (contest.IdStage != newStage)
+                    contest.IdStage = newStage;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IActionResult> Home(string search = "", string category = "", string sort = "new")
         {
             var auth = RequireJury();
@@ -43,6 +78,8 @@ namespace ArtContest.Controllers
             var userId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
             ViewBag.JuryLogin = user?.Login ?? "Член жюри";
+
+            await UpdateContestStages();
 
             var query = _context.Contests
                 .Include(c => c.Category)
@@ -59,8 +96,7 @@ namespace ArtContest.Controllers
 
             query = sort switch
             {
-                "asc" => query.OrderBy(c => c.Title),
-                "desc" => query.OrderByDescending(c => c.Title),
+                "old" => query.OrderBy(c => c.Id),
                 _ => query.OrderByDescending(c => c.Id)
             };
 
@@ -203,7 +239,7 @@ namespace ArtContest.Controllers
             return RedirectToAction("ContestItems", new { id = submission.IdContest });
         }
 
-        public async Task<IActionResult> History(string search = "", string contest = "", string category = "")
+        public async Task<IActionResult> History(string search = "", string contest = "", string sort = "new")
         {
             var auth = RequireJury();
             if (auth != null) return auth;
@@ -211,6 +247,8 @@ namespace ArtContest.Controllers
             var userId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
             ViewBag.JuryLogin = user?.Login ?? "Член жюри";
+
+            await UpdateContestStages();
 
             var query = _context.JuryAssessments
                 .Include(a => a.Submission)
@@ -226,23 +264,23 @@ namespace ArtContest.Controllers
             if (!string.IsNullOrEmpty(contest) && int.TryParse(contest, out int contestId))
                 query = query.Where(a => a.Submission != null && a.Submission.IdContest == contestId);
 
-            if (!string.IsNullOrEmpty(category) && int.TryParse(category, out int catId))
-                query = query.Where(a => a.Submission != null && a.Submission.Contest != null && a.Submission.Contest.IdCategory == catId);
+            query = sort switch
+            {
+                "old" => query.OrderBy(a => a.Id),
+                _ => query.OrderByDescending(a => a.Id)
+            };
 
-            var assessments = await query.OrderByDescending(a => a.Id).ToListAsync();
+            var assessments = await query.ToListAsync();
 
             var contests = await _context.Contests
-                .Where(c => c.IdStage == 3 || c.IdStage == 4)
+                .Where(c => c.IdStage == 3)
                 .OrderByDescending(c => c.Id)
                 .ToListAsync();
 
-            var categories = await _context.ContestCategories.ToListAsync();
-
             ViewBag.Contests = contests;
-            ViewBag.Categories = categories;
             ViewBag.Search = search;
             ViewBag.SelectedContest = contest;
-            ViewBag.SelectedCategory = category;
+            ViewBag.Sort = sort;
 
             return View(assessments);
         }

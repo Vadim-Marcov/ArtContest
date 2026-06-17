@@ -58,12 +58,10 @@
                 <select name="sort" class="filter-select" onchange="this.form.submit()">
                     @{
                         var jSortNew = ViewBag.Sort == "new" || string.IsNullOrEmpty(ViewBag.Sort) ? "selected" : null;
-                        var jSortAsc = ViewBag.Sort == "asc" ? "selected" : null;
-                        var jSortDesc = ViewBag.Sort == "desc" ? "selected" : null;
+                        var jSortOld = ViewBag.Sort == "old" ? "selected" : null;
                     }
                     <option value="new" selected="@jSortNew">Сначала новые</option>
-                    <option value="asc" selected="@jSortAsc">А-Я</option>
-                    <option value="desc" selected="@jSortDesc">Я-А</option>
+                    <option value="old" selected="@jSortOld">Сначала старые</option>
                 </select>
             </div>
         </form>

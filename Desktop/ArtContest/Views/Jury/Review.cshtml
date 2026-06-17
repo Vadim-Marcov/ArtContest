@@ -51,15 +51,15 @@
                 <div class="upload-container">
                     @if (!string.IsNullOrEmpty(submission.SubmissionImage))
                     {
-                        <div class="upload-dropzone" style="border-style:solid;">
+                        <div class="upload-dropzone">
                             <div class="upload-prompt">
-                                <img src="@Url.Content("~/images/" + submission.SubmissionImage)" alt="@submission.Title" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;" />
+                                <img src="@Url.Content("~/images/" + submission.SubmissionImage)" alt="@submission.Title" />
                             </div>
                         </div>
                     }
                     else
                     {
-                        <div class="upload-dropzone">
+                        <div class="upload-dropzone empty-state">
                             <div class="upload-prompt">
                                 <p class="main-prompt">[Изображение работы]</p>
                             </div>
@@ -94,7 +94,7 @@
         }
         else
         {
-            <div style="text-align:center;padding:80px 20px;color:#7c8295;">
+            <div class="not-found-message">
                 Работа не найдена
             </div>
         }
@@ -120,6 +120,11 @@
             font-weight: 600;
             margin-bottom: 20px;
             text-align: center;
+        }
+        .not-found-message {
+            text-align: center;
+            padding: 80px 20px;
+            color: #7c8295;
         }
     </style>
 

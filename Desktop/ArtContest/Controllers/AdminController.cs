@@ -51,18 +51,292 @@ namespace ArtContest.Controllers
             var auth = RequireAdmin();
             if (auth != null) return auth;
             SetAdminLogin();
+
             var totalUsers = await _context.Users.CountAsync();
             var activeContests = await _context.Contests.CountAsync(c => c.IdStage != 4);
             var submissionsOnModeration = await _context.Submissions.CountAsync(s => s.IdModLog == null);
+
+            var contests = await _context.Contests
+                .Include(c => c.Category)
+                .Include(c => c.ApplicationPeriod)
+                .OrderByDescending(c => c.Id)
+                .ToListAsync();
+
+            var submissions = await _context.Submissions
+                .Include(s => s.Contest)
+                .Include(s => s.Contest.Category)
+                .Include(s => s.User)
+                .Include(s => s.JuryAssessments)
+                .Where(s => s.IdModLog != null && s.ModeratorLog != null && s.ModeratorLog.Status == "Одобрено")
+                .ToListAsync();
+
+            var users = await _context.Users
+                .Include(u => u.Region)
+                .ToListAsync();
+
+            var juryScoreReport = submissions
+                .Select(s => new JuryScoreReportItem
+                {
+                    ContestTitle = s.Contest?.Title ?? "",
+                    CategoryName = s.Contest?.Category?.CategoryName ?? "",
+                    SubmissionTitle = s.Title,
+                    AuthorLogin = s.User?.Login ?? "",
+                    TotalScore = s.TotalScore,
+                    JuryCount = s.JuryAssessments?.Count ?? 0
+                })
+                .OrderByDescending(r => r.ContestTitle)
+                .ThenByDescending(r => r.TotalScore)
+                .ToList();
+
+            var winnersReport = submissions
+                .Where(s => s.TotalScore.HasValue)
+                .GroupBy(s => s.IdContest)
+                .SelectMany(g => g.OrderByDescending(s => s.TotalScore).Take(3).Select((s, i) => new WinnerReportItem
+                {
+                    ContestTitle = s.Contest?.Title ?? "",
+                    CategoryName = s.Contest?.Category?.CategoryName ?? "",
+                    SubmissionTitle = s.Title,
+                    AuthorLogin = s.User?.Login ?? "",
+                    TotalScore = s.TotalScore,
+                    Place = i + 1
+                }))
+                .OrderBy(r => r.ContestTitle)
+                .ThenBy(r => r.Place)
+                .ToList();
+
+            var activityByRegion = users
+                .Where(u => u.IdRole == 4)
+                .GroupBy(u => u.Region?.RegionName ?? "Не указан")
+                .Select(g => new ActivityByRegionItem
+                {
+                    RegionName = g.Key,
+                    SubmissionCount = submissions.Count(s => s.User != null && s.User.IdRegion == g.First().IdRegion)
+                })
+                .OrderByDescending(r => r.SubmissionCount)
+                .ToList();
+
+            var activityByAge = users
+                .Where(u => u.IdRole == 4 && !string.IsNullOrEmpty(u.BirthDate))
+                .Select(u =>
+                {
+                    int age = 0;
+                    if (DateTime.TryParse(u.BirthDate, out var birth))
+                    {
+                        age = DateTime.Now.Year - birth.Year;
+                        if (DateTime.Now.DayOfYear < birth.DayOfYear) age--;
+                    }
+                    return new { User = u, Age = age };
+                })
+                .GroupBy(x =>
+                {
+                    if (x.Age < 14) return "до 14 лет";
+                    if (x.Age < 18) return "14-17 лет";
+                    if (x.Age < 25) return "18-24 лет";
+                    if (x.Age < 35) return "25-34 лет";
+                    if (x.Age < 50) return "35-49 лет";
+                    return "50+ лет";
+                })
+                .Select(g => new ActivityByAgeItem
+                {
+                    AgeGroup = g.Key,
+                    SubmissionCount = submissions.Count(s => g.Any(x => x.User.Id == s.IdUser))
+                })
+                .OrderBy(a => a.AgeGroup)
+                .ToList();
+
+            var allSubmissions = await _context.Submissions
+                .Where(s => !string.IsNullOrEmpty(s.SubmissionDate))
+                .ToListAsync();
+
+            var submissionsByDay = allSubmissions
+                .GroupBy(s => s.SubmissionDate)
+                .OrderBy(g => g.Key)
+                .Select(g => new SubmissionsByDayItem
+                {
+                    Date = g.Key,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            var contestCategoryMap = contests.ToDictionary(c => c.Id, c => c.IdCategory);
+            var allCategories = await _context.ContestCategories.ToListAsync();
+            var categoryPopularity = allCategories
+                .Select(c => new CategoryPopularityItem
+                {
+                    CategoryName = c.CategoryName,
+                    SubmissionCount = submissions.Count(s => contestCategoryMap.ContainsKey(s.IdContest) && contestCategoryMap[s.IdContest] == c.Id),
+                    ContestCount = contests.Count(ct => ct.IdCategory == c.Id)
+                })
+                .OrderByDescending(c => c.SubmissionCount)
+                .ToList();
 
             var viewModel = new AdminAnalyticsViewModel
             {
                 TotalUsers = totalUsers,
                 ActiveContests = activeContests,
-                SubmissionsOnModeration = submissionsOnModeration
+                SubmissionsOnModeration = submissionsOnModeration,
+                JuryScoreReport = juryScoreReport,
+                WinnersReport = winnersReport,
+                ActivityByRegion = activityByRegion,
+                ActivityByAge = activityByAge,
+                SubmissionsByDay = submissionsByDay,
+                CategoryPopularity = categoryPopularity,
+                Contests = contests
             };
 
             return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAnalyticsData()
+        {
+            var auth = RequireAdmin();
+            if (auth != null) return Unauthorized();
+
+            var allSubs = await _context.Submissions
+                .Where(s => !string.IsNullOrEmpty(s.SubmissionDate))
+                .Select(s => s.SubmissionDate)
+                .ToListAsync();
+
+            var today = DateTime.Now.Date;
+            var startDate = today.AddDays(-13);
+
+            if (allSubs.Any())
+            {
+                var minDate = allSubs.Min();
+                if (DateTime.TryParse(minDate, out var parsedMin))
+                {
+                    startDate = parsedMin.Date;
+                    if ((today - startDate).TotalDays > 13)
+                    {
+                        startDate = today.AddDays(-13);
+                    }
+                }
+            }
+
+            var submissionsByDay = new List<object>();
+            for (var date = startDate; date <= today; date = date.AddDays(1))
+            {
+                var dateStr = date.ToString("yyyy-MM-dd");
+                var count = allSubs.Count(d => d == dateStr);
+                submissionsByDay.Add(new { date = dateStr, count });
+            }
+
+            var totalUsers = await _context.Users.CountAsync();
+            var activeContests = await _context.Contests.CountAsync(c => c.IdStage != 4);
+            var submissionsOnModeration = await _context.Submissions.CountAsync(s => s.IdModLog == null);
+
+            return Json(new
+            {
+                totalUsers,
+                activeContests,
+                submissionsOnModeration,
+                submissionsByDay
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportReport(string reportType)
+        {
+            var auth = RequireAdmin();
+            if (auth != null) return Unauthorized();
+
+            byte[] bytes;
+            string fileName;
+
+            if (reportType == "excel")
+            {
+                var submissions = await _context.Submissions
+                    .Include(s => s.Contest).ThenInclude(c => c.Category)
+                    .Include(s => s.User)
+                    .Include(s => s.JuryAssessments)
+                    .Where(s => s.IdModLog != null && s.ModeratorLog != null && s.ModeratorLog.Status == "Одобрено")
+                    .ToListAsync();
+
+                submissions = submissions
+                    .OrderByDescending(s => s.Contest?.Title)
+                    .ThenByDescending(s => s.TotalScore)
+                    .ToList();
+
+                var sb = new System.Text.StringBuilder();
+                sb.AppendLine("Конкурс;Категория;Работа;Автор;Средний балл;Кол-во оценок");
+                foreach (var s in submissions)
+                {
+                    var contest = EscapeCsvField(s.Contest?.Title);
+                    var category = EscapeCsvField(s.Contest?.Category?.CategoryName);
+                    var title = EscapeCsvField(s.Title);
+                    var author = EscapeCsvField(s.User?.Login);
+                    var scoreVal = s.TotalScore.HasValue ? Math.Round(s.TotalScore.Value, 2) : (double?)null;
+                    var score = scoreVal?.ToString("F2", new System.Globalization.CultureInfo("ru-RU")) ?? "—";
+                    var count = s.JuryAssessments?.Count ?? 0;
+                    sb.AppendLine($"{contest};{category};{title};{author};{score};{count}");
+                }
+
+                bytes = GetCsvBytesWithBom(sb.ToString());
+                fileName = "svodnaya_vedomost.csv";
+            }
+            else if (reportType == "winners")
+            {
+                var submissions = await _context.Submissions
+                    .Include(s => s.Contest).ThenInclude(c => c.Category)
+                    .Include(s => s.User)
+                    .Where(s => s.TotalScore.HasValue)
+                    .ToListAsync();
+
+                var winners = submissions
+                    .GroupBy(s => new { s.IdContest, s.Contest.Title, s.Contest.Category.CategoryName })
+                    .SelectMany(g => g.OrderByDescending(s => s.TotalScore).Take(3).Select((s, i) => new
+                    {
+                        Contest = g.Key.Title ?? "",
+                        Category = g.Key.CategoryName ?? "",
+                        Submission = s.Title,
+                        Author = s.User?.Login ?? "",
+                        Score = Math.Round(s.TotalScore ?? 0, 2),
+                        Place = i + 1
+                    }))
+                    .OrderBy(r => r.Contest).ThenBy(r => r.Category).ThenBy(r => r.Place)
+                    .ToList();
+
+                var sb = new System.Text.StringBuilder();
+                sb.AppendLine("Конкурс;Категория;Место;Работа;Автор;Балл");
+                foreach (var w in winners)
+                {
+                    var contest = EscapeCsvField(w.Contest);
+                    var category = EscapeCsvField(w.Category);
+                    var submission = EscapeCsvField(w.Submission);
+                    var author = EscapeCsvField(w.Author);
+                    var score = w.Score.ToString("F2", new System.Globalization.CultureInfo("ru-RU"));
+                    sb.AppendLine($"{contest};{category};{w.Place};{submission};{author};{score}");
+                }
+
+                bytes = GetCsvBytesWithBom(sb.ToString());
+                fileName = "reestr_pobediteley.csv";
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+            return File(bytes, "text/csv; charset=utf-8", fileName);
+        }
+
+        private static string EscapeCsvField(string? field)
+        {
+            if (string.IsNullOrEmpty(field))
+                return "\"\"";
+            if (field.Contains(';') || field.Contains('"') || field.Contains('\n'))
+                return "\"" + field.Replace("\"", "\"\"") + "\"";
+            return "\"" + field + "\"";
+        }
+
+        private static byte[] GetCsvBytesWithBom(string content)
+        {
+            var preamble = System.Text.Encoding.UTF8.GetPreamble();
+            var body = System.Text.Encoding.UTF8.GetBytes(content);
+            var result = new byte[preamble.Length + body.Length];
+            Buffer.BlockCopy(preamble, 0, result, 0, preamble.Length);
+            Buffer.BlockCopy(body, 0, result, preamble.Length, body.Length);
+            return result;
         }
 
         public async Task<IActionResult> Users(string search = "", string role = "", string sort = "new")
@@ -655,6 +929,58 @@ namespace ArtContest.Controllers
         public int TotalUsers { get; set; }
         public int ActiveContests { get; set; }
         public int SubmissionsOnModeration { get; set; }
+        public List<JuryScoreReportItem> JuryScoreReport { get; set; } = new();
+        public List<WinnerReportItem> WinnersReport { get; set; } = new();
+        public List<ActivityByRegionItem> ActivityByRegion { get; set; } = new();
+        public List<ActivityByAgeItem> ActivityByAge { get; set; } = new();
+        public List<SubmissionsByDayItem> SubmissionsByDay { get; set; } = new();
+        public List<CategoryPopularityItem> CategoryPopularity { get; set; } = new();
+        public List<Contest> Contests { get; set; } = new();
+    }
+
+    public class JuryScoreReportItem
+    {
+        public string ContestTitle { get; set; } = "";
+        public string CategoryName { get; set; } = "";
+        public string SubmissionTitle { get; set; } = "";
+        public string AuthorLogin { get; set; } = "";
+        public double? TotalScore { get; set; }
+        public int JuryCount { get; set; }
+    }
+
+    public class WinnerReportItem
+    {
+        public string ContestTitle { get; set; } = "";
+        public string CategoryName { get; set; } = "";
+        public string SubmissionTitle { get; set; } = "";
+        public string AuthorLogin { get; set; } = "";
+        public double? TotalScore { get; set; }
+        public int Place { get; set; }
+    }
+
+    public class ActivityByRegionItem
+    {
+        public string RegionName { get; set; } = "";
+        public int SubmissionCount { get; set; }
+    }
+
+    public class ActivityByAgeItem
+    {
+        public string AgeGroup { get; set; } = "";
+        public int SubmissionCount { get; set; }
+    }
+
+    public class SubmissionsByDayItem
+    {
+        public string Date { get; set; } = "";
+        public int Count { get; set; }
+    }
+
+    public class CategoryPopularityItem
+    {
+        public string CategoryName { get; set; } = "";
+        public int SubmissionCount { get; set; }
+        public int ContestCount { get; set; }
     }
 
     public class AdminUsersViewModel

@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArtContest - Аналитика и отчеты</title>
-    <link rel="stylesheet" href="~/css/AdminAnalytics.css">
+    <link rel="stylesheet" href="~/css/AdminAnalytics.css?v=3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,29 +50,340 @@
         </section>
 
         <div class="analytics-bottom-grid">
-
             <section class="chart-card">
-                <h2 class="card-title">Активность загрузки работ</h2>
+                <h2 class="card-title">Динамика подачи заявок</h2>
                 <div class="chart-container">
-                    <div class="chart-axis-box">
-                        <div class="chart-bar bar-blue" style="height: 35%;"></div>
-                        <div class="chart-bar bar-blue" style="height: 60%;"></div>
-                        <div class="chart-bar bar-dark" style="height: 85%;"></div>
-                        <div class="chart-bar bar-blue" style="height: 48%;"></div>
-                    </div>
+                    <div class="chart-axis-box" id="chartAxisBox"></div>
+                    <div class="chart-labels" id="chartLabels"></div>
                 </div>
             </section>
 
             <aside class="export-card">
                 <div class="export-meta">
-                    <h2 class="card-title">Сводный отчет</h2>
-                    <p class="export-text">Сбор данных по всем оценкам, участникам и результатам за выбранный период.</p>
+                    <h2 class="card-title">Экспорт отчетов</h2>
+                    <p class="export-text">Скачать отчеты в формате CSV для дальнейшей работы в MS Excel.</p>
                 </div>
-                <button type="button" class="btn-export">Экспорт в MS Office</button>
+                <div class="export-buttons">
+                    <a href="/Admin/ExportReport?reportType=excel" class="btn-export">Сводная ведомость</a>
+                    <a href="/Admin/ExportReport?reportType=winners" class="btn-export btn-export-secondary">Реестр победителей</a>
+                </div>
             </aside>
-
         </div>
+
+        <div class="report-cards-grid">
+            <section class="report-card">
+                <h2 class="card-title">Детальные отчеты</h2>
+                <p class="report-card-desc">Просмотр полных таблиц с данными об оценках жюри и результатах конкурсов.</p>
+                <div class="report-card-buttons">
+                    <button class="btn-report" onclick="openModal('modalScores')">Сводная ведомость оценок жюри</button>
+                    <button class="btn-report btn-report-secondary" onclick="openModal('modalWinners')">Реестр победителей и призёров</button>
+                </div>
+            </section>
+
+            <section class="report-card">
+                <h2 class="card-title">Статистика</h2>
+                <p class="report-card-desc">Распределение заявок по регионам и возрастным группам.</p>
+                <div class="report-card-buttons">
+                    <button class="btn-report" onclick="openModal('modalRegion')">Статистика по регионам</button>
+                    <button class="btn-report btn-report-secondary" onclick="openModal('modalAge')">Статистика по возрасту</button>
+                </div>
+            </section>
+        </div>
+
+        <section class="report-section">
+            <h2 class="report-section-title">Популярность номинаций</h2>
+            <div class="table-container">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Категория</th>
+                            <th>Конкурсов</th>
+                            <th>Заявок</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.CategoryPopularity.Any())
+                        {
+                            @foreach (var item in Model.CategoryPopularity)
+                            {
+                                <tr>
+                                    <td>@item.CategoryName</td>
+                                    <td>@item.ContestCount</td>
+                                    <td>@item.SubmissionCount</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3" class="empty-row">Нет данных</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
     </main>
+
+    <div class="modal-overlay" id="modalScores" style="display:none;">
+        <div class="modal-box modal-box-wide">
+            <div class="modal-header">
+                <h3 class="modal-title">Сводная ведомость оценок жюри</h3>
+                <button class="modal-close" onclick="closeModal('modalScores')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Конкурс</th>
+                                <th>Категория</th>
+                                <th>Работа</th>
+                                <th>Автор</th>
+                                <th>Средний балл</th>
+                                <th>Оценок жюри</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.JuryScoreReport.Any())
+                            {
+                                @foreach (var item in Model.JuryScoreReport)
+                                {
+                                    <tr>
+                                        <td>@item.ContestTitle</td>
+                                        <td>@item.CategoryName</td>
+                                        <td><span class="work-name-td">@item.SubmissionTitle</span></td>
+                                        <td>@item.AuthorLogin</td>
+                                        <td>@(item.TotalScore?.ToString("F2") ?? "—")</td>
+                                        <td>@item.JuryCount</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="6" class="empty-row">Нет данных об оценках</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalWinners" style="display:none;">
+        <div class="modal-box modal-box-wide">
+            <div class="modal-header">
+                <h3 class="modal-title">Реестр победителей и призёров</h3>
+                <button class="modal-close" onclick="closeModal('modalWinners')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Конкурс</th>
+                                <th>Категория</th>
+                                <th>Место</th>
+                                <th>Работа</th>
+                                <th>Автор</th>
+                                <th>Балл</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.WinnersReport.Any())
+                            {
+                                @foreach (var item in Model.WinnersReport)
+                                {
+                                    <tr>
+                                        <td>@item.ContestTitle</td>
+                                        <td>@item.CategoryName</td>
+                                        <td>
+                                            @if (item.Place == 1)
+                                            {
+                                                <span class="place-badge place-1">1</span>
+                                            }
+                                            else if (item.Place == 2)
+                                            {
+                                                <span class="place-badge place-2">2</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="place-badge place-3">3</span>
+                                            }
+                                        </td>
+                                        <td><span class="work-name-td">@item.SubmissionTitle</span></td>
+                                        <td>@item.AuthorLogin</td>
+                                        <td>@(item.TotalScore?.ToString("F2") ?? "—")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="6" class="empty-row">Нет данных о победителях</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalRegion" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">Статистика по регионам</h3>
+                <button class="modal-close" onclick="closeModal('modalRegion')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Регион</th>
+                                <th>Заявок</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.ActivityByRegion.Any())
+                            {
+                                @foreach (var item in Model.ActivityByRegion)
+                                {
+                                    <tr>
+                                        <td>@item.RegionName</td>
+                                        <td>@item.SubmissionCount</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="2" class="empty-row">Нет данных</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalAge" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 class="modal-title">Статистика по возрасту</h3>
+                <button class="modal-close" onclick="closeModal('modalAge')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Возрастная группа</th>
+                                <th>Заявок</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.ActivityByAge.Any())
+                            {
+                                @foreach (var item in Model.ActivityByAge)
+                                {
+                                    <tr>
+                                        <td>@item.AgeGroup</td>
+                                        <td>@item.SubmissionCount</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="2" class="empty-row">Нет данных</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+        document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+            overlay.addEventListener('click', function (e) {
+                if (e.target === this) this.style.display = 'none';
+            });
+        });
+
+        function formatDate(dateStr) {
+            var parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return parts[2] + '.' + parts[1];
+            }
+            var d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+                return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2);
+            }
+            return dateStr;
+        }
+
+        function renderChart(data) {
+            var axisBox = document.getElementById('chartAxisBox');
+            var labelsBox = document.getElementById('chartLabels');
+            axisBox.innerHTML = '';
+            labelsBox.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                axisBox.innerHTML = '<div class="chart-empty">Нет данных о заявках</div>';
+                return;
+            }
+
+            var displayDays = data.length > 7 ? data.slice(data.length - 7) : data;
+            var maxCount = 0;
+            for (var i = 0; i < displayDays.length; i++) {
+                if (displayDays[i].count > maxCount) maxCount = displayDays[i].count;
+            }
+            if (maxCount === 0) maxCount = 1;
+
+            for (var i = 0; i < displayDays.length; i++) {
+                var day = displayDays[i];
+                var heightPercent = Math.round((day.count / maxCount) * 100);
+                var formattedDate = formatDate(day.date);
+                var tooltipText = formattedDate + ': ' + day.count + ' работ';
+
+                var group = document.createElement('div');
+                group.className = 'chart-bar-group';
+
+                var tooltip = document.createElement('div');
+                tooltip.className = 'chart-bar-tooltip';
+                tooltip.textContent = tooltipText;
+
+                var bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = heightPercent + '%';
+
+                group.appendChild(tooltip);
+                group.appendChild(bar);
+                axisBox.appendChild(group);
+
+                var label = document.createElement('span');
+                label.className = 'chart-label-item';
+                label.textContent = formattedDate;
+                labelsBox.appendChild(label);
+            }
+        }
+
+        function loadChartData() {
+            fetch('/Admin/GetAnalyticsData')
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    renderChart(data.submissionsByDay);
+                })
+                .catch(function () {});
+        }
+
+        loadChartData();
+        setInterval(loadChartData, 10000);
+    </script>
 
 </body>
 </html>

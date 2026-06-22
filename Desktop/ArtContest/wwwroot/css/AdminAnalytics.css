@@ -9,11 +9,9 @@ body {
     background-color: #f6f7fb;
     color: #11142d;
     display: flex;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
-/* ================= БОКОВОЕ МЕНЮ (Из макета жюри) ================= */
 .sidebar {
     width: 260px;
     background-color: #0f2c59;
@@ -21,6 +19,10 @@ body {
     flex-direction: column;
     padding: 40px 0;
     flex-shrink: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
 }
 
 .logo {
@@ -64,21 +66,13 @@ body {
     font-weight: 600;
 }
 
-/* ================= ОСНОВНОЙ КОНТЕНТ ================= */
 .main-content {
     flex-grow: 1;
     padding: 40px 55px;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-}
-
-.main-content::-webkit-scrollbar {
-    display: none;
-}
-.main-content {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    margin-left: 260px;
+    width: calc(100% - 260px);
 }
 
 .content-header {
@@ -86,7 +80,7 @@ body {
     justify-content: space-between;
     align-items: center;
     height: 42px;
-    margin-bottom: 35px; /* Наш уменьшенный отступ */
+    margin-bottom: 35px;
 }
 
 .page-title {
@@ -118,11 +112,10 @@ body {
     color: #0f2c59;
 }
 
-/* ================= СЕТКА МЕТРИК ================= */
 .metrics-grid {
     display: flex;
     gap: 25px;
-    margin-bottom: 35px; /* Наш уменьшенный отступ */
+    margin-bottom: 35px;
     width: 100%;
 }
 
@@ -153,15 +146,14 @@ body {
 .color-orange { color: #f59e0b; }
 .color-green { color: #00ca72; }
 
-/* ================= НИЖНЯЯ ПАНЕЛЬ АНАЛИТИКИ ================= */
 .analytics-bottom-grid {
     display: flex;
     gap: 25px;
     align-items: stretch;
     width: 100%;
+    margin-bottom: 35px;
 }
 
-/* График */
 .chart-card {
     flex: 1;
     background-color: #ffffff;
@@ -181,29 +173,102 @@ body {
 
 .chart-container {
     width: 100%;
-    height: 240px;
     border: 1px solid #e2e5ed;
     border-radius: 12px;
-    padding: 25px 40px 0 40px;
+    padding: 20px 20px 10px 20px;
 }
 
 .chart-axis-box {
     width: 100%;
-    height: 100%;
+    height: 200px;
     display: flex;
     align-items: flex-end;
-    gap: 30px;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px solid #e2e5ed;
+    padding-bottom: 8px;
+}
+
+.chart-bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    position: relative;
 }
 
 .chart-bar {
-    flex: 1;
+    width: 100%;
+    max-width: 40px;
+    background-color: #2563eb;
     border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
 }
 
-.bar-blue { background-color: #2563eb; }
-.bar-dark { background-color: #0f2c59; }
+.chart-bar:hover {
+    opacity: 0.75;
+}
 
-/* Правая колонка экспорта */
+.chart-bar-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #11142d;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.chart-bar-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #11142d;
+}
+
+.chart-bar-group:hover .chart-bar-tooltip {
+    display: block;
+}
+
+.chart-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.chart-label-item {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: #7c8295;
+    white-space: nowrap;
+}
+
+.chart-empty {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7c8295;
+    font-size: 14px;
+}
+
 .export-card {
     width: 320px;
     background-color: #ffffff;
@@ -227,7 +292,12 @@ body {
     line-height: 1.6;
 }
 
-/* Кнопка экспорта */
+.export-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 .btn-export {
     width: 100%;
     background-color: #0f2c59;
@@ -241,8 +311,225 @@ body {
     cursor: pointer;
     transition: background-color 0.2s ease;
     text-align: center;
+    text-decoration: none;
+    display: block;
 }
 
 .btn-export:hover {
     background-color: #0a1f3f;
+}
+
+.btn-export-secondary {
+    background-color: #e8ecf8;
+    color: #0f2c59;
+}
+
+.btn-export-secondary:hover {
+    background-color: #d5ddf0;
+}
+
+
+.report-section {
+    margin-bottom: 35px;
+}
+
+.report-section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #11142d;
+    margin-bottom: 20px;
+}
+
+.table-container {
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef0f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+    overflow-x: auto;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+    min-width: 500px;
+}
+
+.log-table th {
+    background-color: #fafbfc;
+    color: #7c8295;
+    font-weight: 600;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eef0f6;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.log-table td {
+    padding: 16px 20px;
+    color: #11142d;
+    border-bottom: 1px solid #eef0f6;
+    vertical-align: middle;
+}
+
+.log-table tbody tr:hover {
+    background-color: #f9faff;
+}
+
+.log-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.work-name-td {
+    font-weight: 700;
+    color: #11142d;
+}
+
+.empty-row {
+    text-align: center;
+    padding: 40px;
+    color: #7c8295;
+}
+
+.place-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.place-1 { background-color: #f59e0b; }
+.place-2 { background-color: #9a9fae; }
+.place-3 { background-color: #cd7f32; }
+
+.report-cards-grid {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.report-card {
+    flex: 1;
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 25px 30px;
+    border: 1px solid #eef0f6;
+    display: flex;
+    flex-direction: column;
+}
+
+.report-card-desc {
+    font-size: 14px;
+    color: #555e75;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    flex: 1;
+}
+
+.report-card-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-report {
+    width: 100%;
+    background-color: #0f2c59;
+    color: #ffffff;
+    border: none;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+.btn-report:hover {
+    background-color: #0a1f3f;
+}
+
+.btn-report-secondary {
+    background-color: #e8ecf8;
+    color: #0f2c59;
+}
+
+.btn-report-secondary:hover {
+    background-color: #d5ddf0;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-box-wide {
+    max-width: 900px;
+    width: 95%;
+    max-height: 85vh;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #11142d;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #7c8295;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+    color: #11142d;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
 }
